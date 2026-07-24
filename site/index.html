@@ -322,6 +322,56 @@
     color: var(--col-stretch);
   }
 
+  /* ---- alt path: discord ---- */
+  .altpath {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    max-width: 560px;
+    margin: 26px auto 0;
+    animation: rise 700ms 360ms ease-out both;
+  }
+  .altpath-rule { flex: 1; height: 1px; background: var(--border-bright); }
+  .altpath-or {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+  }
+  .discord-cta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 560px;
+    margin: 14px auto 0;
+    padding: 13px 18px;
+    border: 1px solid var(--border-bright);
+    border-radius: var(--radius);
+    background: color-mix(in srgb, var(--col-new) 8%, var(--surface-raised) 85%);
+    text-decoration: none;
+    transition: transform 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+    animation: rise 700ms 400ms ease-out both;
+  }
+  .discord-cta:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in srgb, var(--col-new) 55%, var(--border-bright));
+    box-shadow: 0 10px 30px -14px color-mix(in srgb, var(--col-new) 55%, transparent);
+  }
+  .discord-cta svg { flex-shrink: 0; fill: var(--col-new); }
+  .discord-cta strong {
+    display: block;
+    font-size: 14px;
+    color: var(--text);
+  }
+  .discord-cta small {
+    display: block;
+    margin-top: 2px;
+    font-size: 12.5px;
+    color: var(--text-dim);
+  }
+
   /* ============ marquee tape ============ */
   .tape {
     border-top: 1px solid var(--border);
@@ -421,6 +471,35 @@
     color: transparent;
   }
   .board-sub { color: var(--text-dim); margin-bottom: 36px; max-width: 600px; font-size: 15px; }
+
+  .board-shot {
+    position: relative;
+    margin-bottom: 40px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--surface);
+    box-shadow: 0 20px 60px -30px color-mix(in srgb, var(--col-migrated) 35%, transparent);
+  }
+  .board-shot img { display: block; width: 100%; height: auto; }
+  .board-shot-tag {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--col-migrated) 45%, transparent);
+    background: color-mix(in srgb, var(--bg) 82%, transparent);
+    color: var(--col-migrated);
+    backdrop-filter: blur(4px);
+  }
 
   .cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
 
@@ -528,7 +607,7 @@
   @media (prefers-reduced-motion: reduce) {
     .tape-track { animation: none; }
     .spark, .dot--amber { animation: none; }
-    .eyebrow, h1, .hero .sub, .fuse, .notify { animation: none; }
+    .eyebrow, h1, .hero .sub, .fuse, .notify, .altpath, .discord-cta { animation: none; }
     h1 .grad { animation: none; }
     .fuse-fill, .spark { transition: none; }
     .card:hover { transform: none; }
@@ -560,10 +639,10 @@
         on you. <strong>No rats. No rugs.</strong>
       </p>
 
-      <div class="fuse" role="img" aria-label="Launch progress: 8 percent">
+      <div class="fuse" role="img" aria-label="Launch progress: 65 percent">
         <div class="fuse-head">
           <span class="l">Launch fuse</span>
-          <span class="r" id="fusePct">8%</span>
+          <span class="r" id="fusePct">65%</span>
         </div>
         <div class="fuse-track">
           <div class="fuse-fill" id="fuseFill"></div>
@@ -581,6 +660,19 @@
       <div id="tsBox"></div>
       <div class="notify-err" id="notifyErr">Couldn&rsquo;t lock you in &mdash; try again in a sec.</div>
       <div class="notify-done" id="notifyDone">Locked in. We'll ping you at launch.</div>
+
+      <div class="altpath" aria-hidden="true">
+        <span class="altpath-rule"></span>
+        <span class="altpath-or">or get in now</span>
+        <span class="altpath-rule"></span>
+      </div>
+      <a class="discord-cta" href="https://discord.gg/KQUqj6MnvJ" target="_blank" rel="noopener noreferrer">
+        <svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg>
+        <span>
+          <strong>Join the Discord</strong>
+          <small>Early access before launch &mdash; our trading bots are already live in there.</small>
+        </span>
+      </a>
     </section>
 
     <div class="tape" aria-hidden="true">
@@ -596,12 +688,17 @@
         Nothing hidden, nothing pre-sold.
       </p>
 
+      <figure class="board-shot">
+        <span class="board-shot-tag"><span class="dot dot--teal" aria-hidden="true"></span>Pulse &middot; live screenshot</span>
+        <img src="/img/pulse-preview.webp" width="1600" height="928" loading="lazy" alt="Pulse discovery board showing New Pairs, Final Stretch, and Migrated columns populated with live token data" />
+      </figure>
+
       <div class="cols">
         <div class="col">
           <div class="col-head" style="color: var(--col-migrated);">
             <span class="dot dot--teal" aria-hidden="true"></span>
             Migrated · live
-            <span class="col-count">1</span>
+            <span class="col-count">4</span>
           </div>
           <div class="card card--live">
             <div class="card-top">
@@ -611,29 +708,37 @@
             <p class="card-desc">Three-column live discovery board: new pairs, final stretch, migrated. Filter, sort, quick-buy at feed speed.</p>
             <span class="badge">v1 shipped</span>
           </div>
+          <div class="card card--live">
+            <div class="card-top">
+              <div class="avatar">D</div>
+              <div class="card-name">Discover</div>
+            </div>
+            <p class="card-desc">Every tradable token in one dense table — ranked by volume, age, and mcap across time windows.</p>
+            <span class="badge">shipped</span>
+          </div>
+          <div class="card card--live">
+            <div class="card-top">
+              <div class="avatar">W</div>
+              <div class="card-name">Trackers</div>
+            </div>
+            <p class="card-desc">Tail any wallet — their trades hit your feed the second they land on chain. (X/Twitter feed still on the roadmap.)</p>
+            <span class="badge">shipped</span>
+          </div>
+          <div class="card card--live">
+            <div class="card-top">
+              <div class="avatar">PT</div>
+              <div class="card-name">Paper trading</div>
+            </div>
+            <p class="card-desc">Real bonding-curve and Jupiter-quote fills, a live portfolio ledger, real PnL. Practice mode today, becomes the real thing once we're past the legal gate.</p>
+            <span class="badge">shipped</span>
+          </div>
         </div>
 
         <div class="col">
           <div class="col-head" style="color: var(--col-stretch);">
             <span class="dot dot--amber" aria-hidden="true"></span>
             Final stretch
-            <span class="col-count">3</span>
-          </div>
-          <div class="card card--fire">
-            <div class="card-top">
-              <div class="avatar">IS</div>
-              <div class="card-name">Insider surveillance</div>
-            </div>
-            <p class="card-desc">The infrastructure layer: dev wallets, sniper clusters, bundlers, and fresh-wallet funding trails mapped live — rats flagged on every token before you click buy.</p>
-            <span class="badge">building</span>
-          </div>
-          <div class="card card--fire">
-            <div class="card-top">
-              <div class="avatar">D</div>
-              <div class="card-name">Discover</div>
-            </div>
-            <p class="card-desc">Every tradable token in one dense table — ranked by volume, age, and mcap across time windows.</p>
-            <span class="badge">building</span>
+            <span class="col-count">1</span>
           </div>
           <div class="card card--fire">
             <div class="card-top">
@@ -653,10 +758,10 @@
           </div>
           <div class="card card--deck">
             <div class="card-top">
-              <div class="avatar">W</div>
-              <div class="card-name">Trackers</div>
+              <div class="avatar">IS</div>
+              <div class="card-name">Insider surveillance</div>
             </div>
-            <p class="card-desc">Tail any wallet or X account — their trades hit your feed the second they land on chain.</p>
+            <p class="card-desc">The infrastructure layer: dev wallets, sniper clusters, bundlers, and fresh-wallet funding trails mapped live — rats flagged on every token before you click buy.</p>
             <span class="badge">planned</span>
           </div>
           <div class="card card--deck">
@@ -672,7 +777,7 @@
               <div class="avatar">Pf</div>
               <div class="card-name">Portfolio</div>
             </div>
-            <p class="card-desc">Spot and perps in one place — positions, PnL, history.</p>
+            <p class="card-desc">Live-money spot and perps in one place — real positions, PnL, history, once we're past the legal gate.</p>
             <span class="badge">planned</span>
           </div>
           <div class="card card--deck">
@@ -704,7 +809,9 @@
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   // ---- light the fuse ----
-  var TARGET = 8;
+  var TARGET = 65; // phases 0-5 = MVP (PLAN.md): 0-3 shipped in full, phase 4 mostly (slice 1 shipped,
+  // slice 2 -- limit/TP-SL/blotter -- not started), phase 5 (surveillance) not started.
+  // Recalc if phase status moves; see chainlock-terminal/PLAN.md and second-brain status note.
   requestAnimationFrame(function () {
     requestAnimationFrame(function () {
       document.getElementById("fuseFill").style.width = TARGET + "%";
