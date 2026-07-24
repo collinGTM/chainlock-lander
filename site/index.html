@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Chainlock — the first surveillance-focused Solana terminal</title>
+<meta name="description" content="Chainlock is the first surveillance-focused Solana trading terminal. The whole market on screen: insiders mapped, rats flagged, rugs called early. Launching soon." />
+<link rel="canonical" href="https://chainlock.gg/" />
+<meta name="theme-color" content="#0b0e14" />
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b0e14'/%3E%3Ccircle cx='32' cy='32' r='11' fill='none' stroke='%23ffb454' stroke-width='6'/%3E%3Ccircle cx='32' cy='32' r='3.5' fill='%232dd4a7'/%3E%3C/svg%3E" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://chainlock.gg/" />
+<meta property="og:site_name" content="Chainlock" />
+<meta property="og:title" content="Chainlock — the first surveillance-focused Solana terminal" />
+<meta property="og:description" content="The whole market on screen. Insiders mapped, rats flagged, rugs called early. No rats. No rugs. Launching soon." />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="Chainlock — the first surveillance-focused Solana terminal" />
+<meta name="twitter:description" content="The whole market on screen. Insiders mapped, rats flagged, rugs called early. Launching soon." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&amp;display=swap" rel="stylesheet" />
+<style>
+  /* Same ink-blue floor + lifecycle temperatures as the terminal —
+     but the launch page is allowed to run hot. Deliberate breaks from
+     DESIGN.md for this page only: gradients, glow, motion > 300ms,
+     display type. The terminal itself stays disciplined. */
+  :root {
+    --bg: #0b0e14;
+    --surface: #121722;
+    --surface-raised: #1a2130;
+    --border: #222b3d;
+    --border-bright: #33405a;
+
+    --text: #e8eaf2;
+    --text-dim: #8a93a8;
+    --text-faint: #5b6478;
+
+    --col-new: #8b7cff;
+    --col-stretch: #ffb454;
+    --col-migrated: #2dd4a7;
+
+    --buy: #16c784;
+    --sell: #ea3943;
+
+    --radius: 10px;
+    --radius-sm: 6px;
+
+    --font-display: "Unbounded", system-ui, sans-serif;
+    --font-ui: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+
+    --fuse-grad: linear-gradient(90deg, var(--col-new), var(--col-stretch), var(--col-migrated));
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { color-scheme: dark; scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-ui);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+  }
+
+  .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+  /* ============ ambient field: glow blobs + grid ============ */
+  .field {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+      radial-gradient(600px 420px at 12% -8%, color-mix(in srgb, var(--col-new) 16%, transparent), transparent 70%),
+      radial-gradient(700px 480px at 88% 10%, color-mix(in srgb, var(--col-stretch) 13%, transparent), transparent 70%),
+      radial-gradient(800px 560px at 50% 115%, color-mix(in srgb, var(--col-migrated) 12%, transparent), transparent 70%);
+  }
+  .field::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(color-mix(in srgb, var(--border) 42%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in srgb, var(--border) 42%, transparent) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(1000px 640px at 50% 30%, rgba(0,0,0,0.85), transparent 78%);
+  }
+
+  /* ============ topbar ============ */
+  .topbar {
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 22px;
+    border-bottom: 1px solid var(--border);
+    background: color-mix(in srgb, var(--surface) 78%, transparent);
+    backdrop-filter: blur(6px);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .wordmark {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.06em;
+  }
+  .wordmark span {
+    background: var(--fuse-grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .topbar-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--col-stretch);
+  }
+  .dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  }
+  .dot--amber {
+    background: var(--col-stretch);
+    box-shadow: 0 0 10px 2px color-mix(in srgb, var(--col-stretch) 60%, transparent);
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+  .dot--teal { background: var(--col-migrated); box-shadow: 0 0 8px 1px color-mix(in srgb, var(--col-migrated) 55%, transparent); }
+  .dot--violet { background: var(--col-new); box-shadow: 0 0 8px 1px color-mix(in srgb, var(--col-new) 55%, transparent); }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  /* ============ hero ============ */
+  main { flex: 1; }
+
+  .hero {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 96px 22px 72px;
+    text-align: center;
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 100%;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    border: 1px solid var(--border-bright);
+    border-radius: 999px;
+    padding: 7px 16px;
+    margin-bottom: 34px;
+    background: color-mix(in srgb, var(--surface) 70%, transparent);
+    animation: rise 700ms ease-out both;
+  }
+  .eyebrow b { color: var(--col-stretch); font-weight: 600; }
+
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: clamp(52px, 11vw, 128px);
+    line-height: 0.98;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    margin-bottom: 26px;
+    animation: rise 700ms 80ms ease-out both;
+  }
+  h1 .grad {
+    background: linear-gradient(100deg, var(--col-new) 0%, var(--col-stretch) 45%, var(--col-migrated) 90%);
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: gradShift 5s ease-in-out infinite alternate;
+    filter: drop-shadow(0 0 28px color-mix(in srgb, var(--col-stretch) 30%, transparent));
+  }
+  @keyframes gradShift { from { background-position: 0% 0; } to { background-position: 100% 0; } }
+  @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+
+  .hero .sub {
+    max-width: 620px;
+    margin: 0 auto 44px;
+    color: var(--text-dim);
+    font-size: 16.5px;
+    animation: rise 700ms 160ms ease-out both;
+  }
+  .hero .sub strong { color: var(--text); font-weight: 600; }
+
+  /* ---- the fuse: lit, burning, glowing ---- */
+  .fuse {
+    max-width: 620px;
+    margin: 0 auto 44px;
+    animation: rise 700ms 240ms ease-out both;
+  }
+  .fuse-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .fuse-head .l { color: var(--text-dim); }
+  .fuse-head .r { color: var(--text); font-variant-numeric: tabular-nums; }
+  .fuse-track {
+    position: relative;
+    height: 10px;
+    background: var(--surface-raised);
+    border: 1px solid var(--border-bright);
+    border-radius: 999px;
+  }
+  .fuse-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 0%;
+    border-radius: 999px;
+    background: var(--fuse-grad);
+    box-shadow: 0 0 18px 2px color-mix(in srgb, var(--col-stretch) 45%, transparent);
+    transition: width 1200ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .spark {
+    position: absolute;
+    top: 50%;
+    left: 0%;
+    width: 16px; height: 16px;
+    margin: -8px 0 0 -8px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff 0%, var(--col-stretch) 40%, transparent 72%);
+    filter: drop-shadow(0 0 12px var(--col-stretch));
+    transition: left 1200ms cubic-bezier(0.22, 1, 0.36, 1);
+    animation: flicker 340ms steps(2) infinite;
+  }
+  @keyframes flicker {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.35); opacity: 0.85; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  /* ---- notify ---- */
+  /* Wire the submit handler to your email provider or a worker endpoint.
+     Until then it confirms locally and stores nothing. */
+  .notify {
+    display: flex;
+    gap: 10px;
+    max-width: 560px;
+    margin: 0 auto;
+    flex-wrap: wrap;
+    justify-content: center;
+    animation: rise 700ms 320ms ease-out both;
+  }
+  .notify input {
+    flex: 1;
+    min-width: 240px;
+    height: 48px;
+    background: color-mix(in srgb, var(--surface-raised) 85%, transparent);
+    border: 1px solid var(--border-bright);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 14px;
+    padding: 0 16px;
+  }
+  .notify input::placeholder { color: var(--text-faint); }
+  .notify input:focus {
+    outline: none;
+    border-color: var(--col-stretch);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--col-stretch) 22%, transparent);
+  }
+  .notify button {
+    height: 48px;
+    padding: 0 26px;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: var(--fuse-grad);
+    color: #0b0e14;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: transform 140ms ease, box-shadow 140ms ease;
+    box-shadow: 0 0 22px color-mix(in srgb, var(--col-stretch) 32%, transparent);
+  }
+  .notify button:hover { transform: translateY(-2px); box-shadow: 0 0 32px color-mix(in srgb, var(--col-stretch) 48%, transparent); }
+  .notify button:active { transform: translateY(0); }
+  .notify button:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
+  .notify-done {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 48px;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: var(--col-migrated);
+    text-shadow: 0 0 14px color-mix(in srgb, var(--col-migrated) 45%, transparent);
+  }
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  #tsBox { display: flex; justify-content: center; margin-top: 12px; min-height: 0; }
+  .notify-err {
+    display: none;
+    margin-top: 12px;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    color: var(--col-stretch);
+  }
+
+  /* ============ marquee tape ============ */
+  .tape {
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: color-mix(in srgb, var(--surface) 82%, transparent);
+    overflow: hidden;
+    padding: 13px 0;
+    position: relative;
+  }
+  .tape::before, .tape::after {
+    content: "";
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 90px;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .tape::before { left: 0; background: linear-gradient(90deg, var(--bg), transparent); }
+  .tape::after { right: 0; background: linear-gradient(-90deg, var(--bg), transparent); }
+  .tape-track {
+    display: flex;
+    gap: 48px;
+    width: max-content;
+    animation: scroll 28s linear infinite;
+  }
+  .tape:hover .tape-track { animation-play-state: paused; }
+  @keyframes scroll { to { transform: translateX(-50%); } }
+
+  .tick {
+    display: flex;
+    align-items: baseline;
+    gap: 9px;
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+  .tick-sym { color: var(--text); font-weight: 700; }
+  .tick-sym::before {
+    content: "";
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    margin-right: 8px;
+    vertical-align: 1px;
+    background: var(--stage);
+    box-shadow: 0 0 8px var(--stage);
+  }
+  .tick-price { color: var(--text-dim); transition: color 120ms ease-out; }
+  .tick-price sub { font-size: 0.72em; }
+  .up { color: var(--buy); }
+  .down { color: var(--sell); }
+  .flash-up { color: var(--buy) !important; text-shadow: 0 0 10px color-mix(in srgb, var(--buy) 60%, transparent); }
+  .flash-down { color: var(--sell) !important; text-shadow: 0 0 10px color-mix(in srgb, var(--sell) 60%, transparent); }
+
+  .tape-tag {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    z-index: 3;
+    display: none;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 999px;
+    border: 1px solid var(--border-bright);
+    background: color-mix(in srgb, var(--bg) 90%, transparent);
+    white-space: nowrap;
+  }
+  .tape-tag .dot { width: 5px; height: 5px; }
+  .tape-tag--live { color: var(--col-migrated); border-color: color-mix(in srgb, var(--col-migrated) 45%, transparent); }
+  .tape-tag--sim { color: var(--text-faint); }
+
+  /* ============ the board ============ */
+  .board {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 72px 22px 88px;
+  }
+  .board-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(24px, 4vw, 36px);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    margin-bottom: 10px;
+  }
+  .board-title .grad {
+    background: var(--fuse-grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .board-sub { color: var(--text-dim); margin-bottom: 36px; max-width: 600px; font-size: 15px; }
+
+  .cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+
+  .col-head {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 8px 4px;
+    margin-bottom: 8px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .col-count { margin-left: auto; color: var(--text-faint); }
+
+  .card {
+    --accent: var(--col-new);
+    position: relative;
+    background: color-mix(in srgb, var(--surface) 88%, transparent);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    margin-bottom: 14px;
+    overflow: hidden;
+    transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+  }
+  .card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), transparent 70%);
+  }
+  .card:hover {
+    transform: translateY(-3px);
+    border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+    box-shadow: 0 10px 34px -12px color-mix(in srgb, var(--accent) 38%, transparent);
+  }
+  .card--live { --accent: var(--col-migrated); }
+  .card--fire { --accent: var(--col-stretch); }
+  .card--deck { --accent: var(--col-new); }
+
+  .card-top { display: flex; align-items: center; gap: 12px; margin-bottom: 9px; }
+  .avatar {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: var(--surface-raised);
+    border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--border));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    flex-shrink: 0;
+    text-shadow: 0 0 10px color-mix(in srgb, var(--accent) 50%, transparent);
+  }
+  .card-name { font-weight: 650; font-size: 15px; }
+  .card-desc { color: var(--text-dim); font-size: 13.5px; margin-bottom: 13px; }
+  .badge {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: var(--radius-sm);
+    border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
+    color: color-mix(in srgb, var(--accent) 88%, transparent);
+    background: color-mix(in srgb, var(--accent) 9%, transparent);
+    box-shadow: 0 0 12px -2px color-mix(in srgb, var(--accent) 30%, transparent);
+  }
+
+  /* ============ statusbar ============ */
+  .statusbar {
+    height: 30px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 22px;
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 11px;
+    color: var(--text-faint);
+    gap: 16px;
+  }
+  .statusbar .left, .statusbar .right {
+    display: flex; align-items: center; gap: 13px; white-space: nowrap; overflow: hidden;
+  }
+  .statusbar .dot { width: 6px; height: 6px; }
+
+  /* ============ responsive & motion prefs ============ */
+  @media (max-width: 900px) {
+    .cols { grid-template-columns: 1fr; }
+    .hero { padding-top: 64px; }
+  }
+  @media (max-width: 480px) {
+    .statusbar .right span:nth-child(2) { display: none; }
+    .eyebrow { font-size: 10px; letter-spacing: 0.1em; gap: 7px; padding: 6px 12px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .tape-track { animation: none; }
+    .spark, .dot--amber { animation: none; }
+    .eyebrow, h1, .hero .sub, .fuse, .notify { animation: none; }
+    h1 .grad { animation: none; }
+    .fuse-fill, .spark { transition: none; }
+    .card:hover { transform: none; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="field" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="wordmark">CHAIN<span>LOCK</span></div>
+    <div class="topbar-status" aria-label="Status: fuse lit">
+      <span class="dot dot--amber" aria-hidden="true"></span>
+      fuse lit
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <p class="eyebrow">chainlock.gg <b>//</b> the first surveillance&#8209;focused terminal <b>//</b> launching soon</p>
+
+      <h1>Lock<br /><span class="grad">TF in.</span></h1>
+
+      <p class="sub">
+        <strong>Chainlock</strong> puts the whole market on screen — live discovery,
+        one-click execution, perps, portfolio, and surveillance on every wallet that
+        matters. Dev sells, sniper clusters, insider flow: flagged before they move
+        on you. <strong>No rats. No rugs.</strong>
+      </p>
+
+      <div class="fuse" role="img" aria-label="Launch progress: 8 percent">
+        <div class="fuse-head">
+          <span class="l">Launch fuse</span>
+          <span class="r" id="fusePct">8%</span>
+        </div>
+        <div class="fuse-track">
+          <div class="fuse-fill" id="fuseFill"></div>
+          <div class="spark" id="spark" aria-hidden="true"></div>
+        </div>
+      </div>
+
+      <!-- Submits to /api/subscribe (functions/api/subscribe.js).
+           See README.md for the KV + Turnstile setup steps. -->
+      <form class="notify" id="notifyForm">
+        <input type="email" id="notifyEmail" placeholder="you@domain.com" required aria-label="Email address" />
+        <input class="hp" type="text" id="hpField" name="company" tabindex="-1" autocomplete="off" aria-hidden="true" />
+        <button type="submit">Get the launch ping</button>
+      </form>
+      <div id="tsBox"></div>
+      <div class="notify-err" id="notifyErr">Couldn&rsquo;t lock you in &mdash; try again in a sec.</div>
+      <div class="notify-done" id="notifyDone">Locked in. We'll ping you at launch.</div>
+    </section>
+
+    <div class="tape" aria-hidden="true">
+      <div class="tape-track" id="tapeTrack"></div>
+      <div class="tape-tag" id="tapeTag"></div>
+    </div>
+
+    <section class="board">
+      <h2 class="board-title">What's on <span class="grad">the board</span></h2>
+      <p class="board-sub">
+        Surveillance cuts both ways — so our own build sits under the lamp.
+        Every surface, real status, tracked like a token burning toward migration.
+        Nothing hidden, nothing pre-sold.
+      </p>
+
+      <div class="cols">
+        <div class="col">
+          <div class="col-head" style="color: var(--col-migrated);">
+            <span class="dot dot--teal" aria-hidden="true"></span>
+            Migrated · live
+            <span class="col-count">1</span>
+          </div>
+          <div class="card card--live">
+            <div class="card-top">
+              <div class="avatar">P</div>
+              <div class="card-name">Pulse</div>
+            </div>
+            <p class="card-desc">Three-column live discovery board: new pairs, final stretch, migrated. Filter, sort, quick-buy at feed speed.</p>
+            <span class="badge">v1 shipped</span>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="col-head" style="color: var(--col-stretch);">
+            <span class="dot dot--amber" aria-hidden="true"></span>
+            Final stretch
+            <span class="col-count">3</span>
+          </div>
+          <div class="card card--fire">
+            <div class="card-top">
+              <div class="avatar">IS</div>
+              <div class="card-name">Insider surveillance</div>
+            </div>
+            <p class="card-desc">The infrastructure layer: dev wallets, sniper clusters, bundlers, and fresh-wallet funding trails mapped live — rats flagged on every token before you click buy.</p>
+            <span class="badge">building</span>
+          </div>
+          <div class="card card--fire">
+            <div class="card-top">
+              <div class="avatar">D</div>
+              <div class="card-name">Discover</div>
+            </div>
+            <p class="card-desc">Every tradable token in one dense table — ranked by volume, age, and mcap across time windows.</p>
+            <span class="badge">building</span>
+          </div>
+          <div class="card card--fire">
+            <div class="card-top">
+              <div class="avatar">T</div>
+              <div class="card-name">Token page</div>
+            </div>
+            <p class="card-desc">Chart, trade panel, live data tables. Presets in, order out, zero page-hopping.</p>
+            <span class="badge">charts + execution</span>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="col-head" style="color: var(--col-new);">
+            <span class="dot dot--violet" aria-hidden="true"></span>
+            New pairs · on deck
+            <span class="col-count">4</span>
+          </div>
+          <div class="card card--deck">
+            <div class="card-top">
+              <div class="avatar">W</div>
+              <div class="card-name">Trackers</div>
+            </div>
+            <p class="card-desc">Tail any wallet or X account — their trades hit your feed the second they land on chain.</p>
+            <span class="badge">planned</span>
+          </div>
+          <div class="card card--deck">
+            <div class="card-top">
+              <div class="avatar">Pp</div>
+              <div class="card-name">Perpetuals</div>
+            </div>
+            <p class="card-desc">Perps, same weapon: pairs list, chart, order panel, positions.</p>
+            <span class="badge">planned</span>
+          </div>
+          <div class="card card--deck">
+            <div class="card-top">
+              <div class="avatar">Pf</div>
+              <div class="card-name">Portfolio</div>
+            </div>
+            <p class="card-desc">Spot and perps in one place — positions, PnL, history.</p>
+            <span class="badge">planned</span>
+          </div>
+          <div class="card card--deck">
+            <div class="card-top">
+              <div class="avatar">R</div>
+              <div class="card-name">Rewards</div>
+            </div>
+            <p class="card-desc">Fee tiers, cashback, referrals. Volume pays you back.</p>
+            <span class="badge">planned</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="statusbar">
+    <div class="left">
+      <span class="dot dot--amber" aria-hidden="true"></span>
+      <span>chainlock.gg</span>
+    </div>
+    <div class="right">
+      <span id="solStat">SOL —.——</span>
+      <span>latency —ms</span>
+      <span>© 2026</span>
+    </div>
+  </footer>
+
+<script>
+  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // ---- light the fuse ----
+  var TARGET = 8;
+  requestAnimationFrame(function () {
+    requestAnimationFrame(function () {
+      document.getElementById("fuseFill").style.width = TARGET + "%";
+      document.getElementById("spark").style.left = TARGET + "%";
+    });
+  });
+
+  // ---- notify: POSTs to the Pages Function at /api/subscribe ----
+  var TURNSTILE_SITE_KEY = "0x4AAAAAAD6QJ9gVHsEdOypQ"; // paste your Turnstile site key here to enable bot checks
+  var tsWidget = null;
+  if (TURNSTILE_SITE_KEY) {
+    window.__tsReady = function () {
+      tsWidget = window.turnstile.render("#tsBox", { sitekey: TURNSTILE_SITE_KEY, theme: "dark" });
+    };
+    var ts = document.createElement("script");
+    ts.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?onload=__tsReady";
+    ts.async = true;
+    document.head.appendChild(ts);
+  }
+
+  var notifyForm = document.getElementById("notifyForm");
+  var notifyBtn = notifyForm.querySelector("button");
+  notifyForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var err = document.getElementById("notifyErr");
+    err.style.display = "none";
+    notifyBtn.disabled = true;
+    var oldLabel = notifyBtn.textContent;
+    notifyBtn.textContent = "Locking in\u2026";
+    var payload = {
+      email: document.getElementById("notifyEmail").value,
+      company: document.getElementById("hpField").value,
+      token: tsWidget != null && window.turnstile ? window.turnstile.getResponse(tsWidget) : ""
+    };
+    fetch("/api/subscribe", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(payload)
+    }).then(function (r) { return r.json(); }).then(function (j) {
+      if (!j.ok) throw new Error(j.error || "failed");
+      notifyForm.style.display = "none";
+      var tsBox = document.getElementById("tsBox");
+      if (tsBox) tsBox.style.display = "none";
+      document.getElementById("notifyDone").style.display = "flex";
+    }).catch(function () {
+      err.style.display = "block";
+      notifyBtn.disabled = false;
+      notifyBtn.textContent = oldLabel;
+      if (tsWidget != null && window.turnstile) window.turnstile.reset(tsWidget);
+    });
+  });
+
+  // ================= live tape =================
+  // Real Solana majors. Primary feed: DexScreener (free, keyless, CORS-open,
+  // batch by mint address). Fallback: CoinGecko keyless simple/price.
+  // Last resort: simulated tape, tagged SIM so the page never lies.
+  // One request per 45s per visitor -- far under both APIs' free limits.
+  var TOKENS = [
+    { sym: "SOL",  mint: "So11111111111111111111111111111111111111112",  gecko: "solana" },
+    { sym: "JUP",  mint: "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN",   gecko: "jupiter-exchange-solana" },
+    { sym: "BONK", mint: "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263", gecko: "bonk" },
+    { sym: "WIF",  mint: "EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm", gecko: "dogwifcoin" },
+    { sym: "JTO",  mint: "jtojtomepa8beP8AuQc6eXt5FriJwfFMwQx2v2f9mCL",  gecko: "jito-governance-token" },
+    { sym: "PYTH", mint: "HZ1JovNiVvGrGNiiYvEozEVgZ58xaU3RKwX8eACQBCt3", gecko: "pyth-network" },
+    { sym: "RAY",  mint: "4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R", gecko: "raydium" }
+  ];
+  var state = TOKENS.map(function (t) { return { sym: t.sym, price: null, chg: null }; });
+  var haveLive = false;
+  var simStarted = false;
+
+  var SUBS = "\u2080\u2081\u2082\u2083\u2084\u2085\u2086\u2087\u2088\u2089";
+  function fmtPrice(p) {
+    if (p == null) return "$\u2014";
+    if (p >= 1000) return "$" + p.toLocaleString("en-US", { maximumFractionDigits: 0 });
+    if (p >= 1) return "$" + p.toFixed(2);
+    if (p >= 0.01) return "$" + p.toFixed(4);
+    var s = p.toFixed(12).split(".")[1];
+    var zeros = 0;
+    while (s[zeros] === "0") zeros++;
+    return "$0.0<sub>" + String(zeros).split("").map(function (d) { return SUBS[+d]; }).join("") + "</sub>" + s.slice(zeros, zeros + 4);
+  }
+  function fmtChg(c) {
+    if (c == null) return "\u2014";
+    return (c >= 0 ? "+" : "\u2212") + Math.abs(c).toFixed(1) + "%";
+  }
+
+  // build the marquee (two copies for a seamless loop)
+  var track = document.getElementById("tapeTrack");
+  for (var copy = 0; copy < 2; copy++) {
+    state.forEach(function (t, i) {
+      var el = document.createElement("div");
+      el.className = "tick";
+      el.style.setProperty("--stage", "var(--col-migrated)");
+      el.innerHTML =
+        '<span class="tick-sym">' + t.sym + "</span>" +
+        '<span class="tick-price" data-p="' + i + '">' + fmtPrice(t.price) + "</span>" +
+        '<span class="tick-chg" data-c="' + i + '">' + fmtChg(t.chg) + "</span>";
+      track.appendChild(el);
+    });
+  }
+
+  function render(i, dir) {
+    var t = state[i];
+    document.querySelectorAll('[data-p="' + i + '"]').forEach(function (pEl) {
+      pEl.innerHTML = fmtPrice(t.price);
+      if (!reduceMotion && dir) {
+        var flash = dir > 0 ? "flash-up" : "flash-down";
+        pEl.classList.add(flash);
+        setTimeout(function () { pEl.classList.remove(flash); }, 160);
+      }
+    });
+    document.querySelectorAll('[data-c="' + i + '"]').forEach(function (cEl) {
+      cEl.textContent = fmtChg(t.chg);
+      cEl.className = "tick-chg " + (t.chg == null ? "" : t.chg >= 0 ? "up" : "down");
+    });
+  }
+
+  function setTag(mode) {
+    var tag = document.getElementById("tapeTag");
+    if (mode === "live") {
+      tag.innerHTML = '<span class="dot dot--teal"></span>live \u00b7 24h';
+      tag.className = "tape-tag tape-tag--live";
+    } else {
+      tag.textContent = "sim";
+      tag.className = "tape-tag tape-tag--sim";
+    }
+    tag.style.display = "inline-flex";
+  }
+
+  function applyQuotes(quotes) {
+    var got = 0;
+    state.forEach(function (t, i) {
+      var q = quotes[t.sym];
+      if (!q || !(q.price > 0)) return;
+      var dir = t.price == null ? 0 : q.price > t.price ? 1 : q.price < t.price ? -1 : 0;
+      t.price = q.price;
+      if (q.chg != null && isFinite(q.chg)) t.chg = q.chg;
+      render(i, dir);
+      got++;
+    });
+    if (got) {
+      haveLive = true;
+      setTag("live");
+      var sol = state[0];
+      if (sol.price) document.getElementById("solStat").textContent = "SOL $" + sol.price.toFixed(2);
+    }
+    return got;
+  }
+
+  function fetchDexScreener() {
+    var url = "https://api.dexscreener.com/tokens/v1/solana/" +
+      TOKENS.map(function (t) { return t.mint; }).join(",");
+    return fetch(url).then(function (r) {
+      if (!r.ok) throw new Error("dexscreener " + r.status);
+      return r.json();
+    }).then(function (j) {
+      var pairs = Array.isArray(j) ? j : (j && j.pairs) || [];
+      var best = {};
+      pairs.forEach(function (p) {
+        if (!p || !p.baseToken) return;
+        var tok = null;
+        for (var k = 0; k < TOKENS.length; k++) {
+          if (TOKENS[k].mint === p.baseToken.address) { tok = TOKENS[k]; break; }
+        }
+        if (!tok) return;
+        var liq = (p.liquidity && p.liquidity.usd) || 0;
+        if (!best[tok.sym] || liq > best[tok.sym].liq) {
+          best[tok.sym] = {
+            liq: liq,
+            price: parseFloat(p.priceUsd),
+            chg: p.priceChange && p.priceChange.h24 != null ? parseFloat(p.priceChange.h24) : null
+          };
+        }
+      });
+      if (!applyQuotes(best)) throw new Error("dexscreener empty");
+    });
+  }
+
+  function fetchCoinGecko() {
+    var ids = TOKENS.map(function (t) { return t.gecko; }).join(",");
+    var url = "https://api.coingecko.com/api/v3/simple/price?ids=" + ids +
+      "&vs_currencies=usd&include_24hr_change=true";
+    return fetch(url).then(function (r) {
+      if (!r.ok) throw new Error("coingecko " + r.status);
+      return r.json();
+    }).then(function (j) {
+      var quotes = {};
+      TOKENS.forEach(function (t) {
+        var d = j[t.gecko];
+        if (d && d.usd) quotes[t.sym] = { price: d.usd, chg: d.usd_24h_change != null ? d.usd_24h_change : null };
+      });
+      if (!applyQuotes(quotes)) throw new Error("coingecko empty");
+    });
+  }
+
+  // last-resort simulated tape -- only if no real data ever arrives
+  function startSim() {
+    if (simStarted || haveLive) return;
+    simStarted = true;
+    setTag("sim");
+    var seedP = [161.4, 0.44, 0.0000122, 0.53, 1.62, 0.093, 1.71];
+    var seedC = [1.2, -2.4, 4.1, -0.8, 2.9, -1.1, 0.6];
+    state.forEach(function (t, i) {
+      t.price = seedP[i] || 1;
+      t.chg = seedC[i] || 0;
+      render(i, 0);
+    });
+    if (!reduceMotion) {
+      setInterval(function () {
+        var i = Math.floor(Math.random() * state.length);
+        var t = state[i];
+        var dir = Math.random() < 0.52 ? 1 : -1;
+        t.price = Math.max(t.price * (1 + dir * (0.001 + Math.random() * 0.006)), 1e-9);
+        t.chg = Math.max(-99.9, Math.min(999, t.chg + dir * Math.random() * 0.4));
+        render(i, dir);
+      }, 1400);
+    }
+  }
+
+  var POLL_MS = 45000;
+  function poll() {
+    fetchDexScreener()
+      .catch(function () { return fetchCoinGecko(); })
+      .catch(function () { startSim(); });
+  }
+
+  poll();
+  setInterval(function () { if (!document.hidden) poll(); }, POLL_MS);
+  document.addEventListener("visibilitychange", function () {
+    if (!document.hidden && !simStarted) poll();
+  });
+</script>
+</body>
+</html>
