@@ -1,0 +1,72 @@
+/* Chainlock — design tokens
+ *
+ * Portable export of the token system used by site/index.html.
+ *
+ * NOT SERVED. This file lives outside site/ on purpose (same reason as
+ * README.md — see CLAUDE.md "Repo shape"). It is also NOT linked by the page:
+ * site/_headers sets `style-src 'unsafe-inline' fonts.googleapis.com` with no
+ * 'self', so an external stylesheet would be blocked by CSP. The page keeps its
+ * tokens inline in <style>; this file is the portable copy for reuse elsewhere.
+ *
+ * ⚠ MIRROR — it can drift. If you change the :root block in site/index.html,
+ * change it here too (or delete this file rather than let it go stale).
+ *
+ * Source of truth for the palette is chainlock-terminal/DESIGN.md §5. Every hex
+ * below round-trips exactly through OKLCH — the colours are unchanged from the
+ * terminal, only the notation differs.
+ */
+
+:root {
+  /* ---- neutral ramp — all chrome, all type ---- */
+  --bg:              oklch(16.3% 0.0136 264.1);  /* #0b0e14 */
+  --surface:         oklch(20.5% 0.0234 265.5);  /* #121722 */
+  --surface-raised:  oklch(24.8% 0.0305 264.9);  /* #1a2130 */
+  --border:          oklch(28.9% 0.0355 263.8);  /* #222b3d */
+  --border-bright:   oklch(37.2% 0.0482 263.7);  /* #33405a */
+
+  --text:            oklch(93.8% 0.011  274.9);  /* #e8eaf2 */
+  --text-dim:        oklch(66.3% 0.0329 267.1);  /* #8a93a8 */
+  --text-faint:      oklch(50.3% 0.0338 266.1);  /* #5b6478 */
+
+  /* ---- lifecycle temperature — RESERVED. Stage meaning only, never decorative.
+         On the terminal these mark a token's bonding-curve stage; on the lander
+         they mark a build surface's shipping stage. Same law either way. ---- */
+  --col-new:         oklch(66.3% 0.1876 285.3);  /* #8b7cff violet — newborn / on deck   */
+  --col-stretch:     oklch(82.4% 0.1408 70.2);   /* #ffb454 amber  — burning / in flight */
+  --col-migrated:    oklch(77.8% 0.1461 169.3);  /* #2dd4a7 teal   — settled / shipped   */
+
+  /* ---- market semantics — RESERVED. Price direction only. ---- */
+  --buy:             oklch(73.4% 0.1629 159.8);  /* #16c784 */
+  --sell:            oklch(61.9% 0.2122 23.3);   /* #ea3943 */
+
+  /* Lander-only: DESIGN.md defines no focus token. Drawn from the neutral ramp
+     so it borrows neither a lifecycle accent nor a market colour. */
+  --focus:           var(--text);
+
+  /* ---- spacing — DESIGN.md §5's 4pt scale, extended upward for page rhythm ---- */
+  --space-1: 4px;  --space-2: 8px;   --space-3: 12px; --space-4: 16px;
+  --space-5: 22px; --space-6: 32px;  --space-7: 48px; --space-8: 72px;
+  --space-9: 112px;
+
+  /* ---- type ---- */
+  --text-xs:  11px; --text-sm:  12px; --text-base: 14px; --text-md: 16px;
+  --text-lg:  19px; --text-xl:  24px; --text-2xl:  32px;
+  --text-display: clamp(44px, 8vw, 88px);
+
+  --font-display: "Unbounded", system-ui, sans-serif;
+  --font-ui:      "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  --font-mono:    "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* ---- motion — DESIGN.md §5 t-fast/t-med plus named easings ---- */
+  --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in:     cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-micro: 120ms; --dur-short: 240ms; --dur-long: 900ms;
+
+  /* ---- shape ---- */
+  --radius: 10px; --radius-sm: 6px;
+
+  /* The single sanctioned gradient (DESIGN.md §6): the launch fuse blends the
+     lifecycle accents as the build advances. Nothing else on the page gradients. */
+  --fuse-grad: linear-gradient(90deg, var(--col-new), var(--col-stretch), var(--col-migrated));
+}

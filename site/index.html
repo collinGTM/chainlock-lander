@@ -18,790 +18,896 @@
 <meta name="twitter:description" content="The whole market on screen. Insiders mapped, rats flagged, rugs called early. Launching soon." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&amp;display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&amp;family=IBM+Plex+Sans:wght@400;600&amp;family=Unbounded:wght@700;900&amp;display=swap" rel="stylesheet" />
 <style>
-  /* Same ink-blue floor + lifecycle temperatures as the terminal —
-     but the launch page is allowed to run hot. Deliberate breaks from
-     DESIGN.md for this page only: gradients, glow, motion > 300ms,
-     display type. The terminal itself stays disciplined. */
+/* Hallmark · genre: modern-minimal · macrostructure: Workbench · theme: custom
+ * (chainlock lifecycle palette, locked to chainlock-terminal/DESIGN.md §5)
+ * enrichment: none (typography + one real product capture) · nav: N8 · footer: Ft2
+ * axes: paper-band dark · display-style geometric-sans · accent-hue chromatic-other
+ * paper oklch(16.3% 0.0136 264.1) · accents violet/amber/teal (lifecycle-only)
+ * display Unbounded · body IBM Plex Sans · data IBM Plex Mono
+ * pre-emit critique: P5 H5 E4 S5 R5 V4
+ *
+ * COLOUR LAW (inherited from chainlock-terminal/DESIGN.md §6, no longer excepted):
+ *   neutral ramp ......... all chrome and all type
+ *   violet/amber/teal .... BUILD lifecycle stage only (board + fuse). Never decorative.
+ *   green/red ............ price change only (tape). Never UI state.
+ * The launch fuse is the single sanctioned gradient (DESIGN.md §6 permits it).
+ */
   :root {
-    --bg: #0b0e14;
-    --surface: #121722;
-    --surface-raised: #1a2130;
-    --border: #222b3d;
-    --border-bright: #33405a;
+    /* ---- neutral ramp (DESIGN.md §5, converted to OKLCH; all round-trip exact) ---- */
+    --bg:              oklch(16.3% 0.0136 264.1);  /* #0b0e14 */
+    --surface:         oklch(20.5% 0.0234 265.5);  /* #121722 */
+    --surface-raised:  oklch(24.8% 0.0305 264.9);  /* #1a2130 */
+    --border:          oklch(28.9% 0.0355 263.8);  /* #222b3d */
+    --border-bright:   oklch(37.2% 0.0482 263.7);  /* #33405a */
 
-    --text: #e8eaf2;
-    --text-dim: #8a93a8;
-    --text-faint: #5b6478;
+    --text:            oklch(93.8% 0.011  274.9);  /* #e8eaf2 */
+    --text-dim:        oklch(66.3% 0.0329 267.1);  /* #8a93a8 */
+    --text-faint:      oklch(50.3% 0.0338 266.1);  /* #5b6478 */
 
-    --col-new: #8b7cff;
-    --col-stretch: #ffb454;
-    --col-migrated: #2dd4a7;
+    /* ---- lifecycle temperature — reserved meanings, never decorative ---- */
+    --col-new:         oklch(66.3% 0.1876 285.3);  /* #8b7cff violet — on deck   */
+    --col-stretch:     oklch(82.4% 0.1408 70.2);   /* #ffb454 amber  — in flight */
+    --col-migrated:    oklch(77.8% 0.1461 169.3);  /* #2dd4a7 teal   — shipped   */
 
-    --buy: #16c784;
-    --sell: #ea3943;
+    /* ---- market semantics — price change only ---- */
+    --buy:             oklch(73.4% 0.1629 159.8);  /* #16c784 */
+    --sell:            oklch(61.9% 0.2122 23.3);   /* #ea3943 */
 
-    --radius: 10px;
-    --radius-sm: 6px;
+    /* Lander-only addition: DESIGN.md defines no focus token. Drawn from the
+       neutral ramp on purpose so it borrows neither a lifecycle accent nor a
+       market colour (§6). Conservative pick — revisit if the terminal adds one. */
+    --focus:           var(--text);
+
+    /* ---- spacing: DESIGN.md's 4pt scale, extended upward for page rhythm ---- */
+    --space-1: 4px;  --space-2: 8px;   --space-3: 12px; --space-4: 16px;
+    --space-5: 22px; --space-6: 32px;  --space-7: 48px; --space-8: 72px;
+    --space-9: 112px;
+
+    /* ---- type scale ---- */
+    --text-xs:  11px; --text-sm:  12px; --text-base: 14px; --text-md: 16px;
+    --text-lg:  19px; --text-xl:  24px; --text-2xl:  32px;
+    --text-display: clamp(44px, 8vw, 88px);
+
+    /* ---- motion (DESIGN.md §5 t-fast/t-med, plus hallmark's named easings) ---- */
+    --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-in:     cubic-bezier(0.7, 0, 0.84, 0);
+    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+    --dur-micro: 120ms; --dur-short: 240ms; --dur-long: 900ms;
+
+    --radius: 10px; --radius-sm: 6px;
 
     --font-display: "Unbounded", system-ui, sans-serif;
-    --font-ui: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+    --font-ui: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
 
+    /* The one sanctioned gradient (DESIGN.md §6): the fuse blends the
+       lifecycle accents as the build advances through its stages. */
     --fuse-grad: linear-gradient(90deg, var(--col-new), var(--col-stretch), var(--col-migrated));
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html { color-scheme: dark; scroll-behavior: smooth; }
-
+  html {
+    color-scheme: dark;
+    scroll-behavior: smooth;
+    overflow-x: clip;           /* clip, not hidden — hidden makes a scroll container */
+  }
   body {
     background: var(--bg);
     color: var(--text);
     font-family: var(--font-ui);
-    font-size: 14px;
-    line-height: 1.5;
+    font-size: var(--text-base);
+    line-height: 1.55;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    overflow-x: hidden;
+    overflow-x: clip;
+    -webkit-font-smoothing: antialiased;
   }
-
   .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 
-  /* ============ ambient field: glow blobs + grid ============ */
-  .field {
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    background-image:
-      radial-gradient(600px 420px at 12% -8%, color-mix(in srgb, var(--col-new) 16%, transparent), transparent 70%),
-      radial-gradient(700px 480px at 88% 10%, color-mix(in srgb, var(--col-stretch) 13%, transparent), transparent 70%),
-      radial-gradient(800px 560px at 50% 115%, color-mix(in srgb, var(--col-migrated) 12%, transparent), transparent 70%);
-  }
-  .field::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background-image:
-      linear-gradient(color-mix(in srgb, var(--border) 42%, transparent) 1px, transparent 1px),
-      linear-gradient(90deg, color-mix(in srgb, var(--border) 42%, transparent) 1px, transparent 1px);
-    background-size: 44px 44px;
-    mask-image: radial-gradient(1000px 640px at 50% 30%, rgba(0,0,0,0.85), transparent 78%);
+  /* Shared label voice — DESIGN.md §7: 11px uppercase mono, 0.1em tracking. */
+  .label {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
   }
 
-  /* ============ topbar ============ */
+  :where(a, button, input, summary):focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; display: inline-block; }
+  .dot--new      { background: var(--col-new); }
+  .dot--stretch  { background: var(--col-stretch); }
+  .dot--migrated { background: var(--col-migrated); }
+
+  /* ============ N8 · terminal command nav ============ */
   .topbar {
-    height: 56px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 22px;
+    gap: var(--space-4);
+    min-height: 52px;
+    padding: var(--space-2) var(--space-5);
     border-bottom: 1px solid var(--border);
-    background: color-mix(in srgb, var(--surface) 78%, transparent);
-    backdrop-filter: blur(6px);
+    background: var(--bg);
     position: sticky;
     top: 0;
     z-index: 10;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
   }
+  .prompt { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; }
+  .prompt-caret { color: var(--text-faint); }
   .wordmark {
     font-family: var(--font-display);
     font-weight: 700;
-    font-size: 15px;
-    letter-spacing: 0.06em;
+    font-size: var(--text-base);
+    letter-spacing: 0.04em;
+    color: var(--text);
+    text-decoration: none;
   }
-  .wordmark span {
-    background: var(--fuse-grad);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+  .flags { display: flex; gap: var(--space-3); }
+  .flags a {
+    color: var(--text-dim);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color var(--dur-micro) var(--ease-out);
   }
-  .topbar-status {
+  .flags a:hover { color: var(--text); }
+  .caret {
+    width: 7px; height: 14px;
+    background: var(--text-faint);
+    animation: blink 1.1s steps(1) infinite;
+  }
+  @keyframes blink { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
+
+  .feedstat {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--col-stretch);
+    gap: var(--space-2);
+    color: var(--text-faint);
+    white-space: nowrap;
   }
-  .dot {
-    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
-  }
-  .dot--amber {
-    background: var(--col-stretch);
-    box-shadow: 0 0 10px 2px color-mix(in srgb, var(--col-stretch) 60%, transparent);
-    animation: pulse 1.4s ease-in-out infinite;
-  }
-  .dot--teal { background: var(--col-migrated); box-shadow: 0 0 8px 1px color-mix(in srgb, var(--col-migrated) 55%, transparent); }
-  .dot--violet { background: var(--col-new); box-shadow: 0 0 8px 1px color-mix(in srgb, var(--col-new) 55%, transparent); }
-  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+  .feedstat[data-mode="live"] { color: var(--col-migrated); }
 
-  /* ============ hero ============ */
+  /* ============ hero — asymmetric split, left-biased ============ */
   main { flex: 1; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding-inline: var(--space-5); }
 
   .hero {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 96px 22px 72px;
-    text-align: center;
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: var(--space-8);
+    align-items: start;
+    padding-block: var(--space-9) var(--space-8);
   }
-
-  .eyebrow {
-    display: inline-flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    max-width: 100%;
-    align-items: center;
-    gap: 10px;
-    font-family: var(--font-mono);
-    font-size: 11.5px;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    border: 1px solid var(--border-bright);
-    border-radius: 999px;
-    padding: 7px 16px;
-    margin-bottom: 34px;
-    background: color-mix(in srgb, var(--surface) 70%, transparent);
-    animation: rise 700ms ease-out both;
-  }
-  .eyebrow b { color: var(--col-stretch); font-weight: 600; }
 
   h1 {
     font-family: var(--font-display);
     font-weight: 900;
-    font-size: clamp(52px, 11vw, 128px);
-    line-height: 0.98;
-    letter-spacing: -0.01em;
+    font-size: var(--text-display);
+    line-height: 0.94;
+    letter-spacing: -0.02em;
     text-transform: uppercase;
-    margin-bottom: 26px;
-    animation: rise 700ms 80ms ease-out both;
+    color: var(--text);            /* solid ink — no gradient fill (§6) */
+    overflow-wrap: anywhere;
+    min-width: 0;
+    margin-bottom: var(--space-5);
   }
-  h1 .grad {
-    background: linear-gradient(100deg, var(--col-new) 0%, var(--col-stretch) 45%, var(--col-migrated) 90%);
-    background-size: 200% 100%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    animation: gradShift 5s ease-in-out infinite alternate;
-    filter: drop-shadow(0 0 28px color-mix(in srgb, var(--col-stretch) 30%, transparent));
-  }
-  @keyframes gradShift { from { background-position: 0% 0; } to { background-position: 100% 0; } }
-  @keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
-
-  .hero .sub {
-    max-width: 620px;
-    margin: 0 auto 44px;
+  .lede {
+    max-width: 54ch;
     color: var(--text-dim);
-    font-size: 16.5px;
-    animation: rise 700ms 160ms ease-out both;
+    font-size: var(--text-md);
+    margin-bottom: var(--space-4);
   }
-  .hero .sub strong { color: var(--text); font-weight: 600; }
+  .lede strong { color: var(--text); font-weight: 600; }
+  .claim {
+    font-family: var(--font-mono);
+    font-size: var(--text-base);
+    letter-spacing: 0.04em;
+    color: var(--text);
+    margin-bottom: var(--space-7);
+  }
 
-  /* ---- the fuse: lit, burning, glowing ---- */
-  .fuse {
-    max-width: 620px;
-    margin: 0 auto 44px;
-    animation: rise 700ms 240ms ease-out both;
+  /* ---- notify ---- */
+  .notify { display: flex; gap: var(--space-2); flex-wrap: wrap; max-width: 480px; }
+  .notify input[type="email"] {
+    flex: 1 1 220px;
+    min-width: 0;
+    height: 46px;
+    background: var(--surface-raised);
+    border: 1px solid var(--border-bright);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: var(--text-base);
+    padding-inline: var(--space-4);
+    transition: border-color var(--dur-micro) var(--ease-out);
   }
+  .notify input::placeholder { color: var(--text-faint); }
+  .notify input[type="email"]:focus { outline: none; border-color: var(--text-dim); }
+  .notify input[type="email"]:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .notify button {
+    height: 46px;
+    padding-inline: var(--space-5);
+    border: 1px solid var(--text);
+    border-radius: var(--radius-sm);
+    background: var(--text);       /* solid neutral fill — no gradient (§6) */
+    color: var(--bg);
+    font-family: var(--font-ui);
+    font-weight: 600;
+    font-size: var(--text-base);
+    white-space: nowrap;           /* clickable text never wraps */
+    cursor: pointer;
+    transition: transform var(--dur-micro) var(--ease-out),
+                background-color var(--dur-micro) var(--ease-out);
+  }
+  .notify button:hover { transform: translateY(-1px); }
+  .notify button:active { transform: translateY(0); }
+  .notify button:disabled {
+    background: var(--surface-raised);
+    border-color: var(--border-bright);
+    color: var(--text-faint);
+    cursor: not-allowed;
+    transform: none;
+  }
+  #tsBox:not(:empty) { margin-top: var(--space-3); }
+  .notify-err, .notify-done {
+    display: none;
+    margin-top: var(--space-3);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+  }
+  .notify-err { color: var(--text); }
+  .notify-err::before { content: "! "; color: var(--text-faint); }
+  .notify-done { color: var(--text); }
+  .notify-done::before { content: "\2713 "; color: var(--text-faint); }
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+  /* ---- Discord CTA ----
+     Neutral ramp only. Discord's blurple sits next to --col-new violet, and a
+     violet button would read as the "on deck" lifecycle stage (§6). The loudest
+     law-abiding treatment on this ground is the white fill, so that's what the
+     bots section uses; the hero uses the outlined pair-mate so the launch list
+     stays the hero's filled primary. */
+  .cta-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+  }
+  .btn-discord {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    height: 46px;
+    padding-inline: var(--space-5);
+    border: 1px solid var(--border-bright);
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text);
+    font-family: var(--font-ui);
+    font-weight: 600;
+    font-size: var(--text-base);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: border-color var(--dur-micro) var(--ease-out),
+                background-color var(--dur-micro) var(--ease-out),
+                transform var(--dur-micro) var(--ease-out);
+  }
+  .btn-discord svg { flex-shrink: 0; fill: currentColor; }
+  .btn-discord:hover { border-color: var(--text-dim); background: var(--surface-raised); }
+  .btn-discord--solid {
+    background: var(--text);
+    border-color: var(--text);
+    color: var(--bg);
+    height: 52px;
+    font-size: var(--text-md);
+  }
+  .btn-discord--solid:hover { background: var(--text); border-color: var(--text); transform: translateY(-1px); }
+  .cta-note { font-size: var(--text-base); color: var(--text-faint); }
+
+  /* ============ hero-right · build status instrument ============ */
+  .instrument {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    padding: var(--space-5);
+  }
+  .instrument-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--space-3);
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: var(--space-5);
+  }
+
   .fuse-head {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    margin-bottom: 10px;
-    font-family: var(--font-mono);
-    font-size: 11.5px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
+    margin-bottom: var(--space-2);
   }
-  .fuse-head .l { color: var(--text-dim); }
-  .fuse-head .r { color: var(--text); font-variant-numeric: tabular-nums; }
+  .fuse-head .r {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+    font-size: var(--text-base);
+  }
   .fuse-track {
     position: relative;
-    height: 10px;
+    height: 8px;
     background: var(--surface-raised);
     border: 1px solid var(--border-bright);
     border-radius: 999px;
+    overflow: hidden;
+    margin-bottom: var(--space-6);
   }
   .fuse-fill {
     position: absolute;
     inset: 0 auto 0 0;
     width: 0%;
     border-radius: 999px;
-    background: var(--fuse-grad);
-    box-shadow: 0 0 18px 2px color-mix(in srgb, var(--col-stretch) 45%, transparent);
-    transition: width 1200ms cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  .spark {
-    position: absolute;
-    top: 50%;
-    left: 0%;
-    width: 16px; height: 16px;
-    margin: -8px 0 0 -8px;
-    border-radius: 50%;
-    background: radial-gradient(circle, #fff 0%, var(--col-stretch) 40%, transparent 72%);
-    filter: drop-shadow(0 0 12px var(--col-stretch));
-    transition: left 1200ms cubic-bezier(0.22, 1, 0.36, 1);
-    animation: flicker 340ms steps(2) infinite;
-  }
-  @keyframes flicker {
-    0% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.35); opacity: 0.85; }
-    100% { transform: scale(1); opacity: 1; }
+    background: var(--fuse-grad);   /* the one sanctioned gradient */
+    transition: width var(--dur-long) var(--ease-out);
   }
 
-  /* ---- notify ---- */
-  /* Wire the submit handler to your email provider or a worker endpoint.
-     Until then it confirms locally and stores nothing. */
-  .notify {
+  .stage-row {
     display: flex;
-    gap: 10px;
-    max-width: 560px;
-    margin: 0 auto;
-    flex-wrap: wrap;
-    justify-content: center;
-    animation: rise 700ms 320ms ease-out both;
-  }
-  .notify input {
-    flex: 1;
-    min-width: 240px;
-    height: 48px;
-    background: color-mix(in srgb, var(--surface-raised) 85%, transparent);
-    border: 1px solid var(--border-bright);
-    border-radius: var(--radius-sm);
-    color: var(--text);
+    align-items: center;
+    gap: var(--space-3);
+    padding-block: var(--space-3);
+    border-bottom: 1px solid var(--border);
     font-family: var(--font-mono);
-    font-size: 14px;
-    padding: 0 16px;
-  }
-  .notify input::placeholder { color: var(--text-faint); }
-  .notify input:focus {
-    outline: none;
-    border-color: var(--col-stretch);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--col-stretch) 22%, transparent);
-  }
-  .notify button {
-    height: 48px;
-    padding: 0 26px;
-    border: none;
-    border-radius: var(--radius-sm);
-    background: var(--fuse-grad);
-    color: #0b0e14;
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 13px;
-    letter-spacing: 0.04em;
+    font-size: var(--text-sm);
+    letter-spacing: 0.06em;
     text-transform: uppercase;
-    cursor: pointer;
-    transition: transform 140ms ease, box-shadow 140ms ease;
-    box-shadow: 0 0 22px color-mix(in srgb, var(--col-stretch) 32%, transparent);
+    color: var(--text-dim);
   }
-  .notify button:hover { transform: translateY(-2px); box-shadow: 0 0 32px color-mix(in srgb, var(--col-stretch) 48%, transparent); }
-  .notify button:active { transform: translateY(0); }
-  .notify button:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
-  .notify-done {
-    display: none;
-    justify-content: center;
-    align-items: center;
-    height: 48px;
+  .stage-row:last-of-type { border-bottom: 0; }
+  .stage-row .n {
+    margin-left: auto;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+  .instrument-foot {
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border);
     font-family: var(--font-mono);
-    font-size: 14px;
-    color: var(--col-migrated);
-    text-shadow: 0 0 14px color-mix(in srgb, var(--col-migrated) 45%, transparent);
-  }
-  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
-  #tsBox { display: flex; justify-content: center; margin-top: 12px; min-height: 0; }
-  .notify-err {
-    display: none;
-    margin-top: 12px;
-    font-family: var(--font-mono);
-    font-size: 12.5px;
-    color: var(--col-stretch);
-  }
-
-  /* ---- alt path: discord ---- */
-  .altpath {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 14px;
-    max-width: 560px;
-    margin: 26px auto 0;
-    animation: rise 700ms 360ms ease-out both;
-  }
-  .altpath-rule { flex: 1; height: 1px; background: var(--border-bright); }
-  .altpath-or {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.14em;
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--text-faint);
   }
-  .discord-cta {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    max-width: 560px;
-    margin: 14px auto 0;
-    padding: 13px 18px;
-    border: 1px solid var(--border-bright);
-    border-radius: var(--radius);
-    background: color-mix(in srgb, var(--col-new) 8%, var(--surface-raised) 85%);
-    text-decoration: none;
-    transition: transform 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
-    animation: rise 700ms 400ms ease-out both;
-  }
-  .discord-cta:hover {
-    transform: translateY(-2px);
-    border-color: color-mix(in srgb, var(--col-new) 55%, var(--border-bright));
-    box-shadow: 0 10px 30px -14px color-mix(in srgb, var(--col-new) 55%, transparent);
-  }
-  .discord-cta svg { flex-shrink: 0; fill: var(--col-new); }
-  .discord-cta strong {
-    display: block;
-    font-size: 14px;
-    color: var(--text);
-  }
-  .discord-cta small {
-    display: block;
-    margin-top: 2px;
-    font-size: 12.5px;
-    color: var(--text-dim);
-  }
 
-  /* ============ marquee tape ============ */
+  /* ============ tape — full-bleed divider ============ */
   .tape {
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    background: color-mix(in srgb, var(--surface) 82%, transparent);
+    border-block: 1px solid var(--border);
+    background: var(--surface);
     overflow: hidden;
-    padding: 13px 0;
+    padding-block: var(--space-3);
     position: relative;
   }
   .tape::before, .tape::after {
     content: "";
     position: absolute;
     top: 0; bottom: 0;
-    width: 90px;
+    width: 72px;
     z-index: 2;
     pointer-events: none;
   }
-  .tape::before { left: 0; background: linear-gradient(90deg, var(--bg), transparent); }
-  .tape::after { right: 0; background: linear-gradient(-90deg, var(--bg), transparent); }
+  .tape::before { left: 0; background: linear-gradient(90deg, var(--surface), transparent); }
+  .tape::after { right: 0; background: linear-gradient(-90deg, var(--surface), transparent); }
   .tape-track {
     display: flex;
-    gap: 48px;
+    gap: var(--space-7);
     width: max-content;
-    animation: scroll 28s linear infinite;
+    animation: scroll 34s linear infinite;
   }
-  .tape:hover .tape-track { animation-play-state: paused; }
+  .tape:hover .tape-track, .tape:focus-within .tape-track { animation-play-state: paused; }
   @keyframes scroll { to { transform: translateX(-50%); } }
 
   .tick {
     display: flex;
     align-items: baseline;
-    gap: 9px;
+    gap: var(--space-2);
     font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
-    font-size: 13px;
+    font-size: var(--text-sm);
     white-space: nowrap;
   }
-  .tick-sym { color: var(--text); font-weight: 700; }
-  .tick-sym::before {
-    content: "";
-    display: inline-block;
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    margin-right: 8px;
-    vertical-align: 1px;
-    background: var(--stage);
-    box-shadow: 0 0 8px var(--stage);
-  }
-  .tick-price { color: var(--text-dim); transition: color 120ms ease-out; }
+  .tick-sym { color: var(--text); font-weight: 600; }
+  .tick-price { color: var(--text-dim); }
   .tick-price sub { font-size: 0.72em; }
-  .up { color: var(--buy); }
+  .up { color: var(--buy); }      /* market semantics only */
   .down { color: var(--sell); }
-  .flash-up { color: var(--buy) !important; text-shadow: 0 0 10px color-mix(in srgb, var(--buy) 60%, transparent); }
-  .flash-down { color: var(--sell) !important; text-shadow: 0 0 10px color-mix(in srgb, var(--sell) 60%, transparent); }
+  .flash-up { color: var(--buy) !important; }
+  .flash-down { color: var(--sell) !important; }
 
-  .tape-tag {
-    position: absolute;
-    top: 50%;
-    right: 12px;
-    transform: translateY(-50%);
-    z-index: 3;
-    display: none;
-    align-items: center;
-    gap: 6px;
-    font-family: var(--font-mono);
-    font-size: 10px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    padding: 3px 9px;
-    border-radius: 999px;
-    border: 1px solid var(--border-bright);
-    background: color-mix(in srgb, var(--bg) 90%, transparent);
-    white-space: nowrap;
-  }
-  .tape-tag .dot { width: 5px; height: 5px; }
-  .tape-tag--live { color: var(--col-migrated); border-color: color-mix(in srgb, var(--col-migrated) 45%, transparent); }
-  .tape-tag--sim { color: var(--text-faint); }
+  /* Anchor targets clear the sticky topbar instead of landing under it. */
+  #bots, #board { scroll-margin-top: 68px; }
 
-  /* ============ the board ============ */
-  .board {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 72px 22px 88px;
+  /* ============ bots — live today, paid, funds the build ============ */
+  .bots { padding-block: var(--space-8); }
+  .bots-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    gap: var(--space-8);
+    align-items: start;
   }
-  .board-title {
+  .bots-head h2 {
     font-family: var(--font-display);
     font-weight: 700;
-    font-size: clamp(24px, 4vw, 36px);
+    font-size: var(--text-2xl);
     text-transform: uppercase;
-    letter-spacing: 0.02em;
-    margin-bottom: 10px;
+    letter-spacing: 0.01em;
+    margin-bottom: var(--space-3);
+    overflow-wrap: anywhere;
   }
-  .board-title .grad {
-    background: var(--fuse-grad);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-  .board-sub { color: var(--text-dim); margin-bottom: 36px; max-width: 600px; font-size: 15px; }
+  .bots-head p { color: var(--text-dim); font-size: var(--text-md); max-width: 54ch; }
 
-  .board-shot {
-    position: relative;
-    margin-bottom: 40px;
+  /* A real three-step sequence, so ordinal markers carry information here.
+     Plain 1/2/3 in mono rather than decorative 01/02/03 slabs. */
+  .steps { list-style: none; counter-reset: step; margin-top: var(--space-6); }
+  .steps li {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--space-4);
+    padding-block: var(--space-4);
+    border-top: 1px solid var(--border);
+  }
+  .steps li::before {
+    counter-increment: step;
+    content: counter(step);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.1em;
+    color: var(--text-faint);
+    padding-top: 4px;
+  }
+  .steps h3 { font-size: var(--text-md); font-weight: 600; margin-bottom: var(--space-1); }
+  .steps p { color: var(--text-dim); font-size: var(--text-base); }
+
+  .join {
+    border: 1px solid var(--border-bright);
+    border-radius: var(--radius);
+    background: var(--surface);
+    padding: var(--space-6);
+    position: sticky;
+    top: 76px;
+  }
+  .join h3 {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin-bottom: var(--space-3);
+  }
+  .join p { color: var(--text-dim); font-size: var(--text-base); margin-bottom: var(--space-4); }
+  .join p:last-of-type { margin-bottom: var(--space-6); }
+  .join .proof {
+    margin-top: var(--space-5);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 0;
+  }
+
+  /* ============ workbench — the real capture is the argument ============ */
+  .workbench { padding-block: var(--space-8); }
+  .wb-head { max-width: 62ch; margin-bottom: var(--space-6); }
+  .wb-head h2 {
+    font-family: var(--font-ui);   /* Workbench: headings are functional, not loud */
+    font-weight: 600;
+    font-size: var(--text-xl);
+    letter-spacing: -0.01em;
+    margin-bottom: var(--space-3);
+  }
+  .wb-head p { color: var(--text-dim); font-size: var(--text-md); }
+
+  figure.shot {
     border: 1px solid var(--border);
     border-radius: var(--radius);
     overflow: hidden;
     background: var(--surface);
-    box-shadow: 0 20px 60px -30px color-mix(in srgb, var(--col-migrated) 35%, transparent);
   }
-  .board-shot img { display: block; width: 100%; height: auto; }
-  .board-shot-tag {
-    position: absolute;
-    top: 14px;
-    left: 14px;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
+  figure.shot img { display: block; width: 100%; height: auto; }
+  figure.shot figcaption {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    border-top: 1px solid var(--border);
     font-family: var(--font-mono);
-    font-size: 10.5px;
-    letter-spacing: 0.12em;
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    padding: 4px 10px;
-    border-radius: 999px;
-    border: 1px solid color-mix(in srgb, var(--col-migrated) 45%, transparent);
-    background: color-mix(in srgb, var(--bg) 82%, transparent);
-    color: var(--col-migrated);
-    backdrop-filter: blur(4px);
+    color: var(--text-faint);
   }
+  figure.shot figcaption b { color: var(--text-dim); font-weight: 400; }
 
-  .cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  /* ============ the board — 12-col, weighted by real content volume ============ */
+  .board { padding-block: var(--space-8) var(--space-9); }
+  .board-head { max-width: 62ch; margin-bottom: var(--space-7); }
+  .board-head h2 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--text-2xl);
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+    color: var(--text);
+    margin-bottom: var(--space-3);
+    overflow-wrap: anywhere;
+  }
+  .board-head p { color: var(--text-dim); font-size: var(--text-md); }
+
+  .cols {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--space-5);
+    align-items: start;
+  }
+  /* deliberate asymmetry: track width follows real card count (3 / 2 / 4) */
+  .col--migrated { grid-column: span 4; }
+  .col--stretch  { grid-column: span 3; }
+  .col--deck     { grid-column: span 5; }
 
   .col-head {
     display: flex;
     align-items: center;
-    gap: 9px;
-    padding: 8px 4px;
-    margin-bottom: 8px;
+    gap: var(--space-2);
+    padding-bottom: var(--space-3);
+    margin-bottom: var(--space-4);
+    border-bottom: 1px solid var(--border);
     font-family: var(--font-mono);
-    font-size: 11.5px;
-    letter-spacing: 0.14em;
+    font-size: var(--text-xs);
+    letter-spacing: 0.12em;
     text-transform: uppercase;
   }
-  .col-count { margin-left: auto; color: var(--text-faint); }
+  .col-head .n { margin-left: auto; color: var(--text-faint); }
 
   .card {
     --accent: var(--col-new);
-    position: relative;
-    background: color-mix(in srgb, var(--surface) 88%, transparent);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 18px;
-    margin-bottom: 14px;
-    overflow: hidden;
-    transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+    background: var(--surface);
+    padding: var(--space-4);
+    margin-bottom: var(--space-3);
+    /* elevation via surface lightness, never a coloured halo (§6) */
+    transition: background-color var(--dur-micro) var(--ease-out),
+                border-color var(--dur-micro) var(--ease-out);
   }
-  .card::before {
-    content: "";
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, var(--accent), transparent 70%);
-  }
-  .card:hover {
-    transform: translateY(-3px);
-    border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
-    box-shadow: 0 10px 34px -12px color-mix(in srgb, var(--accent) 38%, transparent);
-  }
-  .card--live { --accent: var(--col-migrated); }
-  .card--fire { --accent: var(--col-stretch); }
-  .card--deck { --accent: var(--col-new); }
+  .card:hover { background: var(--surface-raised); }
+  .card--migrated { --accent: var(--col-migrated); }
+  .card--stretch  { --accent: var(--col-stretch); }
+  .card--deck     { --accent: var(--col-new); }
 
-  .card-top { display: flex; align-items: center; gap: 12px; margin-bottom: 9px; }
-  .avatar {
-    width: 32px; height: 32px;
-    border-radius: 8px;
-    background: var(--surface-raised);
-    border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--border));
+  .card-name {
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-family: var(--font-display);
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--accent);
-    flex-shrink: 0;
-    text-shadow: 0 0 10px color-mix(in srgb, var(--accent) 50%, transparent);
+    gap: var(--space-2);
+    font-weight: 600;
+    font-size: var(--text-md);
+    margin-bottom: var(--space-2);
   }
-  .card-name { font-weight: 650; font-size: 15px; }
-  .card-desc { color: var(--text-dim); font-size: 13.5px; margin-bottom: 13px; }
+  .card-desc { color: var(--text-dim); font-size: var(--text-base); margin-bottom: var(--space-3); }
   .badge {
     display: inline-block;
     font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.09em;
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    padding: 3px 9px;
+    padding: 2px var(--space-2);
     border-radius: var(--radius-sm);
-    border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
-    color: color-mix(in srgb, var(--accent) 88%, transparent);
-    background: color-mix(in srgb, var(--accent) 9%, transparent);
-    box-shadow: 0 0 12px -2px color-mix(in srgb, var(--accent) 30%, transparent);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    background: transparent;      /* DESIGN.md §8: 1px border, transparent fill */
   }
 
-  /* ============ statusbar ============ */
+  /* ============ Ft2 · inline single-line statusbar ============ */
   .statusbar {
-    height: 30px;
     border-top: 1px solid var(--border);
     background: var(--surface);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 22px;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-4);
+    padding: var(--space-3) var(--space-5);
     font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
-    font-size: 11px;
+    font-size: var(--text-xs);
     color: var(--text-faint);
-    gap: 16px;
   }
-  .statusbar .left, .statusbar .right {
-    display: flex; align-items: center; gap: 13px; white-space: nowrap; overflow: hidden;
-  }
-  .statusbar .dot { width: 6px; height: 6px; }
+  .statusbar .grp { display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap; }
 
-  /* ============ responsive & motion prefs ============ */
-  @media (max-width: 900px) {
-    .cols { grid-template-columns: 1fr; }
-    .hero { padding-top: 64px; }
+  /* ============ responsive ============ */
+  @media (max-width: 940px) {
+    .hero { grid-template-columns: minmax(0, 1fr); gap: var(--space-7); padding-block: var(--space-7) var(--space-6); }
+    .bots-grid { grid-template-columns: minmax(0, 1fr); gap: var(--space-7); }
+    .join { position: static; }
+    /* Collapse the 12-track grid outright — keeping 12 tracks and spanning 12
+       leaves 11 gaps (352px at --space-6), which overflows a 288px content box
+       at 320px and gets silently clipped by overflow-x: clip. */
+    .cols { grid-template-columns: minmax(0, 1fr); gap: var(--space-6); }
+    .col--migrated, .col--stretch, .col--deck { grid-column: auto; }
   }
-  @media (max-width: 480px) {
-    .statusbar .right span:nth-child(2) { display: none; }
-    .eyebrow { font-size: 10px; letter-spacing: 0.1em; gap: 7px; padding: 6px 12px; }
+  @media (max-width: 560px) {
+    :root { --text-display: clamp(38px, 13vw, 56px); }
+    .wrap { padding-inline: var(--space-4); }
+    .topbar { padding-inline: var(--space-4); }
+    .flags { gap: var(--space-2); }
+    .board { padding-block: var(--space-7); }
   }
+
   @media (prefers-reduced-motion: reduce) {
-    .tape-track { animation: none; }
-    .spark, .dot--amber { animation: none; }
-    .eyebrow, h1, .hero .sub, .fuse, .notify, .altpath, .discord-cta { animation: none; }
-    h1 .grad { animation: none; }
-    .fuse-fill, .spark { transition: none; }
-    .card:hover { transform: none; }
+    .tape-track, .caret { animation: none; }
+    .fuse-fill { transition: none; }
+    * { scroll-behavior: auto; }
   }
 </style>
 </head>
 <body>
 
-  <div class="field" aria-hidden="true"></div>
-
   <header class="topbar">
-    <div class="wordmark">CHAIN<span>LOCK</span></div>
-    <div class="topbar-status" aria-label="Status: fuse lit">
-      <span class="dot dot--amber" aria-hidden="true"></span>
-      fuse lit
+    <div class="prompt">
+      <span class="prompt-caret" aria-hidden="true">&gt;</span>
+      <a class="wordmark" href="/">CHAINLOCK</a>
+      <nav class="flags" aria-label="Sections">
+        <a href="#bots">--bots</a>
+        <a href="#board">--board</a>
+        <a href="https://discord.gg/KQUqj6MnvJ" target="_blank" rel="noopener noreferrer">--discord</a>
+      </nav>
+      <span class="caret" aria-hidden="true"></span>
     </div>
+    <div class="feedstat" id="tapeTag" aria-live="polite"></div>
   </header>
 
   <main>
-    <section class="hero">
-      <p class="eyebrow">chainlock.gg <b>//</b> the first surveillance&#8209;focused terminal <b>//</b> launching soon</p>
+    <div class="wrap">
+      <section class="hero">
+        <div>
+          <h1>Lock<br />TF in.</h1>
 
-      <h1>Lock<br /><span class="grad">TF in.</span></h1>
+          <p class="lede">
+            <strong>Chainlock</strong> puts the whole market on screen: live discovery,
+            one-click execution, perps, portfolio, and surveillance on every wallet that
+            matters. Dev sells, sniper clusters, insider flow, all flagged before they
+            move on you.
+          </p>
+          <p class="claim">No rats. No rugs.</p>
 
-      <p class="sub">
-        <strong>Chainlock</strong> puts the whole market on screen: live discovery,
-        one-click execution, perps, portfolio, and surveillance on every wallet that
-        matters. Dev sells, sniper clusters, insider flow: flagged before they move
-        on you. <strong>No rats. No rugs.</strong>
-      </p>
+          <!-- Submits to /api/subscribe (functions/api/subscribe.js).
+               See README.md for the KV + Turnstile setup steps. -->
+          <form class="notify" id="notifyForm">
+            <input type="email" id="notifyEmail" placeholder="you@domain.com" required aria-label="Email address" />
+            <input class="hp" type="text" id="hpField" name="company" tabindex="-1" autocomplete="off" aria-hidden="true" />
+            <button type="submit">Get the launch ping</button>
+          </form>
+          <div id="tsBox"></div>
+          <p class="notify-err" id="notifyErr">Couldn&rsquo;t lock you in. Try again in a sec.</p>
+          <p class="notify-done" id="notifyDone">Locked in. We&rsquo;ll ping you at launch.</p>
 
-      <div class="fuse" role="img" aria-label="Launch progress: 44 percent">
-        <div class="fuse-head">
-          <span class="l">Launch fuse</span>
-          <span class="r" id="fusePct">44%</span>
+          <div class="cta-row">
+            <a class="btn-discord" href="https://discord.gg/KQUqj6MnvJ" target="_blank" rel="noopener noreferrer">
+              <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg>
+              Join the Discord
+            </a>
+            <span class="cta-note">The signal bots are live in there now.</span>
+          </div>
         </div>
-        <div class="fuse-track">
-          <div class="fuse-fill" id="fuseFill"></div>
-          <div class="spark" id="spark" aria-hidden="true"></div>
-        </div>
-      </div>
 
-      <!-- Submits to /api/subscribe (functions/api/subscribe.js).
-           See README.md for the KV + Turnstile setup steps. -->
-      <form class="notify" id="notifyForm">
-        <input type="email" id="notifyEmail" placeholder="you@domain.com" required aria-label="Email address" />
-        <input class="hp" type="text" id="hpField" name="company" tabindex="-1" autocomplete="off" aria-hidden="true" />
-        <button type="submit">Get the launch ping</button>
-      </form>
-      <div id="tsBox"></div>
-      <div class="notify-err" id="notifyErr">Couldn&rsquo;t lock you in, try again in a sec.</div>
-      <div class="notify-done" id="notifyDone">Locked in. We'll ping you at launch.</div>
+        <aside class="instrument" aria-label="Chainlock build status">
+          <div class="instrument-head">
+            <span class="label">Build status</span>
+            <span class="label" style="color: var(--text-faint)">chainlock.gg</span>
+          </div>
 
-      <div class="altpath" aria-hidden="true">
-        <span class="altpath-rule"></span>
-        <span class="altpath-or">or get in now</span>
-        <span class="altpath-rule"></span>
-      </div>
-      <a class="discord-cta" href="https://discord.gg/KQUqj6MnvJ" target="_blank" rel="noopener noreferrer">
-        <svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg>
-        <span>
-          <strong>Join the Discord</strong>
-          <small>Early access before launch, our trading bots are already live in there.</small>
-        </span>
-      </a>
-    </section>
+          <div class="fuse-head">
+            <span class="label">Launch fuse</span>
+            <span class="r" id="fusePct">&mdash;</span>
+          </div>
+          <div class="fuse-track">
+            <div class="fuse-fill" id="fuseFill"></div>
+          </div>
 
-    <div class="tape" aria-hidden="true">
-      <div class="tape-track" id="tapeTrack"></div>
-      <div class="tape-tag" id="tapeTag"></div>
+          <div class="stage-row">
+            <span class="dot dot--migrated" aria-hidden="true"></span>
+            Migrated &middot; live <span class="n">3</span>
+          </div>
+          <div class="stage-row">
+            <span class="dot dot--stretch" aria-hidden="true"></span>
+            Final stretch <span class="n">2</span>
+          </div>
+          <div class="stage-row">
+            <span class="dot dot--new" aria-hidden="true"></span>
+            New pairs &middot; on deck <span class="n">4</span>
+          </div>
+
+          <p class="instrument-foot">9 surfaces tracked &middot; 0 tokens sold</p>
+        </aside>
+      </section>
     </div>
 
-    <section class="board">
-      <h2 class="board-title">What's on <span class="grad">the board</span></h2>
-      <p class="board-sub">
-        Surveillance cuts both ways, so our own build sits under the lamp.
-        Every surface, real status, tracked like a token burning toward migration.
-        Nothing hidden, nothing pre-sold.
-      </p>
+    <div class="tape">
+      <div class="tape-track" id="tapeTrack" aria-hidden="true"></div>
+    </div>
 
-      <figure class="board-shot">
-        <span class="board-shot-tag"><span class="dot dot--teal" aria-hidden="true"></span>Pulse &middot; live screenshot</span>
-        <img src="/img/pulse-preview.webp" width="1600" height="928" loading="lazy" alt="Pulse discovery board showing New Pairs, Final Stretch, and Migrated columns populated with live token data" />
-      </figure>
+    <div class="wrap">
+      <section class="bots" id="bots">
+        <div class="bots-grid">
+          <div class="bots-head">
+            <h2>The bots are already running</h2>
+            <p>
+              The terminal is still being built. The signal bots are not waiting for it.
+              They post calls in Discord today, and every call is timestamped in the
+              channel, so the record is readable before you pay for anything.
+            </p>
 
-      <div class="cols">
-        <div class="col">
-          <div class="col-head" style="color: var(--col-migrated);">
-            <span class="dot dot--teal" aria-hidden="true"></span>
-            Migrated · live
-            <span class="col-count">3</span>
+            <ol class="steps">
+              <li>
+                <div>
+                  <h3>A bot posts the call</h3>
+                  <p>Entry hits the channel the moment the bot sees it, timestamped, in the open.</p>
+                </div>
+              </li>
+              <li>
+                <div>
+                  <h3>You take the trade</h3>
+                  <p>Your wallet, your size, your decision. The bots never touch your funds.</p>
+                </div>
+              </li>
+              <li>
+                <div>
+                  <h3>The record stays up</h3>
+                  <p>Calls are not deleted. Scroll back as far as you want before you decide.</p>
+                </div>
+              </li>
+            </ol>
           </div>
-          <div class="card card--live">
-            <div class="card-top">
-              <div class="avatar">P</div>
-              <div class="card-name">Pulse</div>
-            </div>
-            <p class="card-desc">Three-column live discovery board: new pairs, final stretch, migrated. Filter, sort, quick-buy at feed speed.</p>
-            <span class="badge">v1 shipped</span>
-          </div>
-          <div class="card card--live">
-            <div class="card-top">
-              <div class="avatar">D</div>
-              <div class="card-name">Discover</div>
-            </div>
-            <p class="card-desc">Every tradable token in one dense table, ranked by volume, age, and mcap across time windows.</p>
-            <span class="badge">shipped</span>
-          </div>
-          <div class="card card--live">
-            <div class="card-top">
-              <div class="avatar">W</div>
-              <div class="card-name">Trackers</div>
-            </div>
-            <p class="card-desc">Tail any wallet: their trades hit your feed the second they land on chain. (X/Twitter feed still on the roadmap.)</p>
-            <span class="badge">shipped</span>
-          </div>
+
+          <aside class="join">
+            <h3>Read the record, then decide</h3>
+            <p>
+              Access is paid, and that is deliberate. It funds the terminal on the board
+              below and the people building it.
+            </p>
+            <p>
+              You are not buying a promise. You are buying the feed that is running right
+              now, and paying for the thing that comes after it.
+            </p>
+            <a class="btn-discord btn-discord--solid" href="https://discord.gg/KQUqj6MnvJ" target="_blank" rel="noopener noreferrer">
+              <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg>
+              Join the Discord
+            </a>
+            <p class="proof">Every call, timestamped, public</p>
+          </aside>
+        </div>
+      </section>
+
+      <section class="workbench">
+        <div class="wb-head">
+          <h2>This is Pulse, running.</h2>
+          <p>
+            Not a mockup. A capture of the live discovery board: every new pair on Solana
+            entering at the left, burning through the bonding curve in the middle, and
+            landing on the AMM at the right.
+          </p>
+        </div>
+        <figure class="shot">
+          <img src="/img/pulse-preview.webp" width="1600" height="928" loading="lazy" decoding="async"
+               alt="The Pulse discovery board: three columns headed New Pairs, Final Stretch and Migrated, each populated with live Solana token rows showing market cap, volume, transaction count and holder counts." />
+          <figcaption>
+            <span><b>Columns</b> new pairs &rarr; final stretch &rarr; migrated</span>
+            <span><b>Rows</b> mcap &middot; vol &middot; tx &middot; holders</span>
+            <span><b>Age</b> live, to the second</span>
+          </figcaption>
+        </figure>
+      </section>
+
+      <section class="board" id="board">
+        <div class="board-head">
+          <h2>What&rsquo;s on the board</h2>
+          <p>
+            Surveillance cuts both ways, so our own build sits under the lamp. Every surface,
+            real status, tracked like a token burning toward migration. Nothing hidden,
+            no token, no presale.
+          </p>
         </div>
 
-        <div class="col">
-          <div class="col-head" style="color: var(--col-stretch);">
-            <span class="dot dot--amber" aria-hidden="true"></span>
-            Final stretch
-            <span class="col-count">2</span>
-          </div>
-          <div class="card card--fire">
-            <div class="card-top">
-              <div class="avatar">T</div>
-              <div class="card-name">Token page</div>
+        <div class="cols">
+          <div class="col--migrated">
+            <div class="col-head" style="color: var(--col-migrated)">
+              <span class="dot dot--migrated" aria-hidden="true"></span>
+              Migrated &middot; live <span class="n">3</span>
             </div>
-            <p class="card-desc">Chart, trade panel, live data tables. Presets in, order out, zero page-hopping.</p>
-            <span class="badge">charts + execution</span>
+            <article class="card card--migrated">
+              <h3 class="card-name">Pulse</h3>
+              <p class="card-desc">Three-column live discovery board: new pairs, final stretch, migrated. Filter, sort, quick-buy at feed speed.</p>
+              <span class="badge">v1 shipped</span>
+            </article>
+            <article class="card card--migrated">
+              <h3 class="card-name">Discover</h3>
+              <p class="card-desc">Every tradable token in one dense table, ranked by volume, age, and mcap across time windows.</p>
+              <span class="badge">shipped</span>
+            </article>
+            <article class="card card--migrated">
+              <h3 class="card-name">Trackers</h3>
+              <p class="card-desc">Tail any wallet: their trades hit your feed the second they land on chain. (X/Twitter feed still on the roadmap.)</p>
+              <span class="badge">shipped</span>
+            </article>
           </div>
-          <div class="card card--fire">
-            <div class="card-top">
-              <div class="avatar">PT</div>
-              <div class="card-name">Paper trading</div>
-            </div>
-            <p class="card-desc">Real bonding-curve and Jupiter-quote fills, a live portfolio ledger, real PnL. Practice mode today, becomes the real thing once we're past the legal gate.</p>
-            <span class="badge">market orders live</span>
-          </div>
-        </div>
 
-        <div class="col">
-          <div class="col-head" style="color: var(--col-new);">
-            <span class="dot dot--violet" aria-hidden="true"></span>
-            New pairs · on deck
-            <span class="col-count">4</span>
-          </div>
-          <div class="card card--deck">
-            <div class="card-top">
-              <div class="avatar">IS</div>
-              <div class="card-name">Insider surveillance</div>
+          <div class="col--stretch">
+            <div class="col-head" style="color: var(--col-stretch)">
+              <span class="dot dot--stretch" aria-hidden="true"></span>
+              Final stretch <span class="n">2</span>
             </div>
-            <p class="card-desc">The infrastructure layer: dev wallets, sniper clusters, bundlers, and fresh-wallet funding trails mapped live. Rats flagged on every token before you click buy.</p>
-            <span class="badge">planned</span>
+            <article class="card card--stretch">
+              <h3 class="card-name">Token page</h3>
+              <p class="card-desc">Chart, trade panel, live data tables. Presets in, order out, zero page-hopping.</p>
+              <span class="badge">charts + execution</span>
+            </article>
+            <article class="card card--stretch">
+              <h3 class="card-name">Paper trading</h3>
+              <p class="card-desc">Real bonding-curve and Jupiter-quote fills, a live portfolio ledger, real PnL. Practice mode today, becomes the real thing once we&rsquo;re past the legal gate.</p>
+              <span class="badge">market orders live</span>
+            </article>
           </div>
-          <div class="card card--deck">
-            <div class="card-top">
-              <div class="avatar">Pp</div>
-              <div class="card-name">Perpetuals</div>
+
+          <div class="col--deck">
+            <div class="col-head" style="color: var(--col-new)">
+              <span class="dot dot--new" aria-hidden="true"></span>
+              New pairs &middot; on deck <span class="n">4</span>
             </div>
-            <p class="card-desc">Perps, same weapon: pairs list, chart, order panel, positions.</p>
-            <span class="badge">planned</span>
-          </div>
-          <div class="card card--deck">
-            <div class="card-top">
-              <div class="avatar">Pf</div>
-              <div class="card-name">Portfolio</div>
-            </div>
-            <p class="card-desc">Live-money spot and perps in one place: real positions, PnL, history, once we're past the legal gate.</p>
-            <span class="badge">planned</span>
-          </div>
-          <div class="card card--deck">
-            <div class="card-top">
-              <div class="avatar">R</div>
-              <div class="card-name">Rewards</div>
-            </div>
-            <p class="card-desc">Fee tiers, cashback, referrals. Volume pays you back.</p>
-            <span class="badge">planned</span>
+            <article class="card card--deck">
+              <h3 class="card-name">Insider surveillance</h3>
+              <p class="card-desc">The infrastructure layer: dev wallets, sniper clusters, bundlers, and fresh-wallet funding trails mapped live. Rats flagged on every token before you click buy.</p>
+              <span class="badge">planned</span>
+            </article>
+            <article class="card card--deck">
+              <h3 class="card-name">Perpetuals</h3>
+              <p class="card-desc">Perps, same weapon: pairs list, chart, order panel, positions.</p>
+              <span class="badge">planned</span>
+            </article>
+            <article class="card card--deck">
+              <h3 class="card-name">Portfolio</h3>
+              <p class="card-desc">Live-money spot and perps in one place: real positions, PnL, history, once we&rsquo;re past the legal gate.</p>
+              <span class="badge">planned</span>
+            </article>
+            <article class="card card--deck">
+              <h3 class="card-name">Rewards</h3>
+              <p class="card-desc">Fee tiers, cashback, referrals. Volume pays you back.</p>
+              <span class="badge">planned</span>
+            </article>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </div>
   </main>
 
   <footer class="statusbar">
-    <div class="left">
-      <span class="dot dot--amber" aria-hidden="true"></span>
+    <div class="grp">
       <span>chainlock.gg</span>
+      <span>the first surveillance-focused Solana terminal</span>
     </div>
-    <div class="right">
-      <span id="solStat">SOL —.——</span>
-      <span>latency —ms</span>
-      <span>© 2026</span>
+    <div class="grp">
+      <span id="solStat">SOL &mdash;.&mdash;&mdash;</span>
+      <span>&copy; 2026</span>
     </div>
   </footer>
 
@@ -809,14 +915,23 @@
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   // ---- light the fuse ----
+  // Single source of truth: the bar, the readout and the a11y label all derive
+  // from TARGET, so bumping it here can't leave a stale number on the page.
   var TARGET = 44; // Collin's call, set below the phase-week-weighted 65% estimate --
   // see commit history/second-brain for that math. Recalc if phase status moves.
-  requestAnimationFrame(function () {
+  (function () {
+    var pct = document.getElementById("fusePct");
+    var fill = document.getElementById("fuseFill");
+    pct.textContent = TARGET + "%";
+    fill.setAttribute("role", "progressbar");
+    fill.setAttribute("aria-valuenow", String(TARGET));
+    fill.setAttribute("aria-valuemin", "0");
+    fill.setAttribute("aria-valuemax", "100");
+    fill.setAttribute("aria-label", "Launch progress");
     requestAnimationFrame(function () {
-      document.getElementById("fuseFill").style.width = TARGET + "%";
-      document.getElementById("spark").style.left = TARGET + "%";
+      requestAnimationFrame(function () { fill.style.width = TARGET + "%"; });
     });
-  });
+  })();
 
   // ---- notify: POSTs to the Pages Function at /api/subscribe ----
   var TURNSTILE_SITE_KEY = "0x4AAAAAAD6QJ9gVHsEdOypQ"; // paste your Turnstile site key here to enable bot checks
@@ -839,7 +954,7 @@
     err.style.display = "none";
     notifyBtn.disabled = true;
     var oldLabel = notifyBtn.textContent;
-    notifyBtn.textContent = "Locking in\u2026";
+    notifyBtn.textContent = "Locking in…";
     var payload = {
       email: document.getElementById("notifyEmail").value,
       company: document.getElementById("hpField").value,
@@ -854,7 +969,7 @@
       notifyForm.style.display = "none";
       var tsBox = document.getElementById("tsBox");
       if (tsBox) tsBox.style.display = "none";
-      document.getElementById("notifyDone").style.display = "flex";
+      document.getElementById("notifyDone").style.display = "block";
     }).catch(function () {
       err.style.display = "block";
       notifyBtn.disabled = false;
@@ -881,9 +996,9 @@
   var haveLive = false;
   var simStarted = false;
 
-  var SUBS = "\u2080\u2081\u2082\u2083\u2084\u2085\u2086\u2087\u2088\u2089";
+  var SUBS = "₀₁₂₃₄₅₆₇₈₉";
   function fmtPrice(p) {
-    if (p == null) return "$\u2014";
+    if (p == null) return "$—";
     if (p >= 1000) return "$" + p.toLocaleString("en-US", { maximumFractionDigits: 0 });
     if (p >= 1) return "$" + p.toFixed(2);
     if (p >= 0.01) return "$" + p.toFixed(4);
@@ -893,8 +1008,8 @@
     return "$0.0<sub>" + String(zeros).split("").map(function (d) { return SUBS[+d]; }).join("") + "</sub>" + s.slice(zeros, zeros + 4);
   }
   function fmtChg(c) {
-    if (c == null) return "\u2014";
-    return (c >= 0 ? "+" : "\u2212") + Math.abs(c).toFixed(1) + "%";
+    if (c == null) return "—";
+    return (c >= 0 ? "+" : "−") + Math.abs(c).toFixed(1) + "%";
   }
 
   // build the marquee (two copies for a seamless loop)
@@ -903,7 +1018,6 @@
     state.forEach(function (t, i) {
       var el = document.createElement("div");
       el.className = "tick";
-      el.style.setProperty("--stage", "var(--col-migrated)");
       el.innerHTML =
         '<span class="tick-sym">' + t.sym + "</span>" +
         '<span class="tick-price" data-p="' + i + '">' + fmtPrice(t.price) + "</span>" +
@@ -928,16 +1042,16 @@
     });
   }
 
+  // Feed status lives in the topbar (it is status, and the topbar is the status line).
   function setTag(mode) {
     var tag = document.getElementById("tapeTag");
     if (mode === "live") {
-      tag.innerHTML = '<span class="dot dot--teal"></span>live \u00b7 24h';
-      tag.className = "tape-tag tape-tag--live";
+      tag.innerHTML = '<span class="dot dot--migrated"></span>LIVE · 24H';
+      tag.setAttribute("data-mode", "live");
     } else {
-      tag.textContent = "sim";
-      tag.className = "tape-tag tape-tag--sim";
+      tag.textContent = "SIM";
+      tag.setAttribute("data-mode", "sim");
     }
-    tag.style.display = "inline-flex";
   }
 
   function applyQuotes(quotes) {
