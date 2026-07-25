@@ -31,15 +31,32 @@ and **chainlock.gg does not change** — while wrangler still prints
 "Deployment complete!" and a working URL. This has silently happened at least
 twice (2026-07-24, and a `master` preview 5h earlier the same day).
 
-Always pass the branch explicitly:
+## Deploy gotcha 2: `functions/` is found relative to CWD, not the path argument
+`wrangler pages deploy <dir>` discovers the `functions/` folder relative to the
+**current working directory**, not relative to `<dir>`. Deploying with an
+absolute path from the repo root therefore ships the site **with no Functions
+bundle at all**, silently killing `/api/subscribe`, while still printing
+"Deployment complete!". This happened on 2026-07-24 and the signup endpoint was
+dead in production until it was caught.
+
+Tell the two apart by the deploy output. A correct deploy prints **both**:
 ```
-npx wrangler pages deploy /home/collin/chainlock-lander/site \
-  --project-name=chainlock --branch=production --commit-dirty=true
+✨ Compiled Worker successfully
+✨ Uploading Functions bundle
 ```
-Then verify the apex actually changed, don't trust the success line:
+If those two lines are missing, the Worker did not ship. Redeploy, don't shrug.
+
+## The only correct deploy command
+`cd` into `site/` first and deploy `.` — never an absolute path, never the root:
 ```
-curl -s https://chainlock.gg/ | grep -c 'The bots are already running'
-npx wrangler pages deployment list --project-name=chainlock   # Environment column
+cd ~/chainlock-lander/site
+npx wrangler pages deploy . --project-name=chainlock --branch=production --commit-dirty=true
+```
+Then verify against the live apex, never the success line:
+```
+curl -s -o /dev/null -w '%{http_code}\n' https://chainlock.gg/api/subscribe   # want 405
+curl -s https://chainlock.gg/ | grep -c 'og:image'                            # want 5
+npx wrangler pages deployment list --project-name=chainlock                   # Environment column
 ```
 
 ## Stack

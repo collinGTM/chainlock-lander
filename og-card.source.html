@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;600&family=Unbounded:wght@700;900&display=swap" rel="stylesheet" />
+<style>
+  /* Social card for chainlock.gg. Same colour law as the site: neutral ramp
+     carries all type; the only accent is the existing brand mark, which already
+     ships in the favicon. Nothing decorative borrows a lifecycle colour. */
+  :root {
+    --bg: #0b0e14;
+    --surface: #121722;
+    --border: #222b3d;
+    --border-bright: #33405a;
+    --text: #e8eaf2;
+    --text-dim: #8a93a8;
+    --text-faint: #5b6478;
+    --amber: #ffb454;
+    --teal: #2dd4a7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1200px; height: 630px; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "IBM Plex Sans", system-ui, sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 68px 72px 56px;
+    position: relative;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  /* Faint instrument grid, drawn from the border token so it stays neutral. */
+  body::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 60px 60px;
+    opacity: 0.5;
+    -webkit-mask-image: radial-gradient(900px 520px at 22% 40%, #000 20%, transparent 78%);
+            mask-image: radial-gradient(900px 520px at 22% 40%, #000 20%, transparent 78%);
+  }
+  .row { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 40px; }
+
+  .brand { display: flex; align-items: center; gap: 20px; }
+  .mark { flex-shrink: 0; display: block; }
+  .brandname {
+    font-family: "Unbounded", sans-serif;
+    font-weight: 700;
+    font-size: 30px;
+    letter-spacing: 0.09em;
+  }
+  .tag {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 17px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    white-space: nowrap;
+  }
+
+  main { position: relative; }
+  h1 {
+    font-family: "Unbounded", sans-serif;
+    font-weight: 900;
+    font-size: 116px;
+    line-height: 0.9;
+    letter-spacing: -0.025em;
+    text-transform: uppercase;
+    margin-bottom: 30px;
+  }
+  .lede {
+    font-size: 30px;
+    line-height: 1.32;
+    color: var(--text-dim);
+    max-width: 640px;
+  }
+  /* Browsers treat the hyphen in "surveillance-focused" as a break opportunity,
+     which split it across two lines. Keep the compound intact. */
+  .lede b { color: var(--text); font-weight: 600; white-space: nowrap; }
+
+  .foot { position: relative; align-items: flex-end; }
+  .claim {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 26px;
+    letter-spacing: 0.03em;
+    color: var(--text);
+  }
+  .url {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 20px;
+    letter-spacing: 0.1em;
+    color: var(--text-faint);
+  }
+</style>
+</head>
+<body>
+
+  <div class="row">
+    <div class="brand">
+      <!-- the established brand mark, same geometry as the site favicon -->
+      <svg class="mark" width="52" height="52" viewBox="0 0 64 64" aria-hidden="true">
+        <rect width="64" height="64" rx="14" fill="#121722" stroke="#33405a" stroke-width="1.5"/>
+        <circle cx="32" cy="32" r="11" fill="none" stroke="#ffb454" stroke-width="6"/>
+        <circle cx="32" cy="32" r="3.5" fill="#2dd4a7"/>
+      </svg>
+      <span class="brandname">CHAINLOCK</span>
+    </div>
+    <span class="tag">Launching soon</span>
+  </div>
+
+  <main>
+    <h1>Lock<br />TF in.</h1>
+    <p class="lede">The first <b>surveillance-focused</b> Solana terminal.</p>
+  </main>
+
+  <div class="row foot">
+    <span class="claim">No rats. No rugs.</span>
+    <span class="url">chainlock.gg</span>
+  </div>
+
+</body>
+</html>
