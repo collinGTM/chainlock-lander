@@ -15,13 +15,39 @@ chainlock-lander/
 ├── README.md   ← deploy guide; stays OUTSIDE site/ so it's never served
 └── site/       ← everything here is what actually deploys
     ├── index.html
+    ├── success.html        ← Stripe success_url
     ├── _headers            ← security headers + CSP
-    └── functions/api/subscribe.js   ← signup endpoint → /api/subscribe
+    ├── .dev.vars           ← LOCAL secrets, gitignored, never deployed
+    └── functions/
+        ├── api/checkout.js        → /api/checkout
+        ├── api/stripe-webhook.js  → /api/stripe-webhook
+        ├── claim/index.js         → /claim
+        └── claim/callback.js      → /claim/callback
 ```
 - **Deploy from inside `site/`**, never the repo root. `wrangler pages
   deploy .` from the root would publish this README as a live page.
 - Avoid the Cloudflare dashboard drag-and-drop uploader for deploys; it can
-  silently skip `functions/`, which kills the signup endpoint with no error.
+  silently skip `functions/`, which kills every endpoint with no error.
+
+## No build step, and keep it that way
+There is no `package.json`, no bundler, no npm dependency anywhere. Every
+function talks to Stripe/Discord/Resend over raw `fetch` and uses WebCrypto for
+signature work. Each function file is **self-contained**, including small
+duplicated `json()` / `page()` helpers, rather than importing a shared module.
+That is deliberate: it keeps the Functions bundle a flat set of leaves and keeps
+the deploy command byte-for-byte identical, which is the thing that has broken
+twice below. **Do not add a dependency to "clean this up".**
+
+## `/api/subscribe` is gone. Don't bring it back.
+The launch-list email form, its Turnstile gate, and `functions/api/subscribe.js`
+were removed when the site switched to selling access. The `SIGNUPS` KV
+namespace was deliberately **left intact** with its data, for the free-join
+nurture sequence when that gets built.
+
+Note that unknown paths do **not** 404 here: Pages has no `404.html`, so it
+serves `index.html` with a 200 for anything unmatched. `GET /api/subscribe`
+therefore looks alive. The real tell that it is gone is that a **POST** returns
+405 from the static handler instead of the endpoint's old `{"ok":true}` JSON.
 
 ## Deploy gotcha: the production branch is `production`, not `master`
 The git branch here is `master`, but the Pages project's production branch is
@@ -60,12 +86,48 @@ npx wrangler pages deployment list --project-name=chainlock                   # 
 ```
 
 ## Stack
-Cloudflare Pages (free tier) for hosting + the Pages Functions signup
-endpoint. KV (`SIGNUPS` binding — must be that exact variable name) stores
-signups: email as key (dedupes for free) + JSON value of timestamp/country.
-Turnstile gates the signup endpoint — site key is pasted into `index.html`
-(`TURNSTILE_SITE_KEY`), secret key is a Pages env var (`TURNSTILE_SECRET`).
-Namecheap is registrar only; Cloudflare owns DNS/serving.
+Cloudflare Pages (free tier) for hosting plus the Pages Functions that take
+payment and grant access. KV (`MEMBERS` binding, must be that exact variable
+name) stores claim codes, member records and webhook idempotency markers; see
+README.md for the key layout. Stripe Checkout takes the $25 one-time payment,
+Resend sends the access email, and a Discord bot puts the buyer in the guild
+with the paid role. Namecheap is registrar only; Cloudflare owns DNS/serving.
+
+Every function **degrades honestly when unconfigured** rather than throwing:
+`/api/checkout` answers 503 without `STRIPE_SECRET_KEY` and the buy button shows
+a real message. Keep that property when editing, it is what lets the site be
+deployed and browser-tested before credentials exist.
+
+## Discord: the three things that silently grant nothing
+
+1. **`PUT /guilds/{guild}/members/{user}` returns 204 when the user is already
+   in the server, and silently IGNORES the `roles` in the request body.** It
+   only returns 201 and applies roles for someone genuinely new. The funnel is
+   explicitly join-free-then-upgrade, so **204 is the common case**, and the
+   follow-up `PUT /members/{user}/roles/{role}` in `claim/callback.js` is what
+   makes the majority of purchases work. Test with an account that is *already*
+   in the guild; testing only with a fresh account exercises the 201 path and
+   proves nothing about real buyers.
+2. **The bot needs BOTH `CREATE_INSTANT_INVITE` and `MANAGE_ROLES`.** The first
+   is required to add a member at all, the second to attach the role. Only one
+   ticked fails in a way that looks like the other thing working.
+3. **The bot's own role must sit ABOVE the paid role** in Server Settings →
+   Roles, or role assignment 403s regardless of permissions. This is invisible
+   from the API side and reads as a mysterious permissions bug.
+
+## Stripe webhook notes
+Read the body with `await request.text()` **before** parsing anything: the
+signature covers the raw bytes, and parsing first destroys the ability to
+verify. Verification uses `crypto.subtle.verify`, which is constant-time by
+construction, rather than a hand-rolled hex comparison.
+
+Access is granted by the **webhook**, never by the buyer reaching `/success`, so
+a closed tab cannot cost someone their access. Claim codes are keyed to the
+checkout session (`sess:<id>`), so a Stripe retry re-sends the same link instead
+of minting a second one.
+
+The signing secret is per-endpoint. The value `stripe listen` prints locally is a
+different secret and will not verify production traffic.
 
 ## Live-site tells
 The **topbar** (right side) shows a teal "LIVE · 24H" tag once a price API is

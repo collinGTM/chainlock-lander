@@ -223,26 +223,17 @@
     margin-bottom: var(--space-7);
   }
 
-  /* ---- notify ---- */
-  .notify { display: flex; gap: var(--space-2); flex-wrap: wrap; max-width: 480px; }
-  .notify input[type="email"] {
-    flex: 1 1 220px;
-    min-width: 0;
-    height: 46px;
-    background: var(--surface-raised);
-    border: 1px solid var(--border-bright);
-    border-radius: var(--radius-sm);
-    color: var(--text);
-    font-family: var(--font-mono);
-    font-size: var(--text-base);
-    padding-inline: var(--space-4);
-    transition: border-color var(--dur-micro) var(--ease-out);
-  }
-  .notify input::placeholder { color: var(--text-faint); }
-  .notify input[type="email"]:focus { outline: none; border-color: var(--text-dim); }
-  .notify input[type="email"]:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
-  .notify button {
-    height: 46px;
+  /* ---- buy CTA ----
+     The page's primary conversion, and the only loud control in the hero.
+     Inherits the solid neutral fill the launch-list button used to carry, so
+     the treatment is unchanged from the 2026-07-24 redesign: no gradient, no
+     glow, no coloured shadow (§6). */
+  .buy { display: flex; flex-direction: column; align-items: flex-start; max-width: 480px; }
+  .btn-buy {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    height: 52px;
     padding-inline: var(--space-5);
     border: 1px solid var(--text);
     border-radius: var(--radius-sm);
@@ -250,77 +241,59 @@
     color: var(--bg);
     font-family: var(--font-ui);
     font-weight: 600;
-    font-size: var(--text-base);
+    font-size: var(--text-md);
     white-space: nowrap;           /* clickable text never wraps */
     cursor: pointer;
     transition: transform var(--dur-micro) var(--ease-out),
                 background-color var(--dur-micro) var(--ease-out);
   }
-  .notify button:hover { transform: translateY(-1px); }
-  .notify button:active { transform: translateY(0); }
-  .notify button:disabled {
+  .btn-buy:hover { transform: translateY(-1px); }
+  .btn-buy:active { transform: translateY(0); }
+  .btn-buy:disabled {
     background: var(--surface-raised);
     border-color: var(--border-bright);
     color: var(--text-faint);
     cursor: not-allowed;
     transform: none;
   }
-  #tsBox:not(:empty) { margin-top: var(--space-3); }
-  .notify-err, .notify-done {
+  /* Price rides inside the button, mono + tabular so it reads as a figure
+     rather than as label text. */
+  .btn-buy .price {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-weight: 500;
+    opacity: 0.7;
+  }
+  .buy-err {
     display: none;
     margin-top: var(--space-3);
     font-family: var(--font-mono);
     font-size: var(--text-sm);
-  }
-  .notify-err { color: var(--text); }
-  .notify-err::before { content: "! "; color: var(--text-faint); }
-  .notify-done { color: var(--text); }
-  .notify-done::before { content: "\2713 "; color: var(--text-faint); }
-  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
-
-  /* ---- Discord CTA ----
-     Neutral ramp only. Discord's blurple sits next to --col-new violet, and a
-     violet button would read as the "on deck" lifecycle stage (§6). The loudest
-     law-abiding treatment on this ground is the white fill, so that's what the
-     bots section uses; the hero uses the outlined pair-mate so the launch list
-     stays the hero's filled primary. */
-  .cta-row {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--space-3);
-    margin-top: var(--space-4);
-  }
-  .btn-discord {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2);
-    height: 46px;
-    padding-inline: var(--space-5);
-    border: 1px solid var(--border-bright);
-    border-radius: var(--radius-sm);
-    background: transparent;
     color: var(--text);
-    font-family: var(--font-ui);
-    font-weight: 600;
+  }
+  .buy-err::before { content: "! "; color: var(--text-faint); }
+
+  /* ---- free tier, deliberately marginal ----
+     Free access stays live. It is what keeps the bots section's "read the
+     record before you pay" claim honest, and it is the top of the funnel the
+     paid role upgrades from. But it must not compete with the buy button, so
+     it is small faint type rather than a peer button. Neutral ramp only:
+     Discord's blurple would sit next to --col-new violet and read as the "on
+     deck" lifecycle stage (§6). */
+  .cta-note {
+    margin-top: var(--space-3);
     font-size: var(--text-base);
-    text-decoration: none;
-    white-space: nowrap;
-    transition: border-color var(--dur-micro) var(--ease-out),
-                background-color var(--dur-micro) var(--ease-out),
-                transform var(--dur-micro) var(--ease-out);
+    color: var(--text-faint);
   }
-  .btn-discord svg { flex-shrink: 0; fill: currentColor; }
-  .btn-discord:hover { border-color: var(--text-dim); background: var(--surface-raised); }
-  .btn-discord--solid {
-    background: var(--text);
-    border-color: var(--text);
-    color: var(--bg);
-    height: 52px;
-    font-size: var(--text-md);
+  .cta-note a {
+    color: var(--text-dim);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: var(--border-bright);
+    transition: color var(--dur-micro) var(--ease-out),
+                text-decoration-color var(--dur-micro) var(--ease-out);
   }
-  .btn-discord--solid:hover { background: var(--text); border-color: var(--text); transform: translateY(-1px); }
-  .cta-note { font-size: var(--text-base); color: var(--text-faint); }
+  .cta-note a:hover { color: var(--text); text-decoration-color: var(--text-dim); }
 
   /* ============ hero-right · build status instrument ============ */
   .instrument {
@@ -501,7 +474,13 @@
     margin-bottom: var(--space-3);
   }
   .join p { color: var(--text-dim); font-size: var(--text-base); margin-bottom: var(--space-4); }
-  .join p:last-of-type { margin-bottom: var(--space-6); }
+  /* The gap before the CTA used to come from `p:last-of-type`, which stopped
+     meaning "the last argument paragraph" once the buy button, error line and
+     free-tier note were added below it. Hang the spacing off the button itself
+     so it cannot drift again when copy is added or removed. */
+  .join .btn-buy { margin-top: var(--space-2); }
+  .join .buy-err { margin-bottom: 0; }
+  .join .cta-note { margin-bottom: 0; }
   .join .proof {
     margin-top: var(--space-5);
     padding-top: var(--space-4);
@@ -698,23 +677,21 @@
           </p>
           <p class="claim">No rats. No rugs.</p>
 
-          <!-- Submits to /api/subscribe (functions/api/subscribe.js).
-               See README.md for the KV + Turnstile setup steps. -->
-          <form class="notify" id="notifyForm">
-            <input type="email" id="notifyEmail" placeholder="you@domain.com" required aria-label="Email address" />
-            <input class="hp" type="text" id="hpField" name="company" tabindex="-1" autocomplete="off" aria-hidden="true" />
-            <button type="submit">Get the launch ping</button>
-          </form>
-          <div id="tsBox"></div>
-          <p class="notify-err" id="notifyErr">Couldn&rsquo;t lock you in. Try again in a sec.</p>
-          <p class="notify-done" id="notifyDone">Locked in. We&rsquo;ll ping you at launch.</p>
-
-          <div class="cta-row">
-            <a class="btn-discord" href="https://discord.gg/KQUqj6MnvJ" target="_blank" rel="noopener noreferrer">
-              <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg>
-              Join the Discord
-            </a>
-            <span class="cta-note">The signal bots are live in there now.</span>
+          <!-- Primary conversion. POSTs to /api/checkout
+               (functions/api/checkout.js), which creates a Stripe Checkout
+               Session and hands back its hosted URL to redirect to. No
+               Stripe.js on the page, so no card data ever touches this origin.
+               See README.md for the Stripe + Discord + Resend setup steps. -->
+          <div class="buy">
+            <button class="btn-buy" id="buyBtn" type="button">
+              Get Wolf Den access <span class="price">$25</span>
+            </button>
+            <p class="buy-err" id="buyErr">Couldn&rsquo;t start checkout. Try again in a sec.</p>
+            <p class="cta-note">
+              One time, not a subscription. The signal bots are live now, or
+              <a href="https://discord.gg/KQUqj6MnvJ" target="_blank" rel="noopener noreferrer">look around the free channels</a>
+              first.
+            </p>
           </div>
         </div>
 
@@ -790,18 +767,26 @@
           <aside class="join">
             <h3>Read the record, then decide</h3>
             <p>
-              Access is paid, and that is deliberate. It funds the terminal on the board
-              below and the people building it.
+              The free channels stay open, so you can read the calls before you spend a
+              thing. Paid access is a role on top of that, and it is deliberate: it funds
+              the terminal on the board below and the people building it.
             </p>
             <p>
-              You are not buying a promise. You are buying the feed that is running right
-              now, and paying for the thing that comes after it.
+              <strong>The Wolf Den</strong> is what the role opens: the trading teachers,
+              the bot devs, the signal channels the bots post into, and the Chainlock
+              terminal as it ships. You are not buying a promise. You are buying the feed
+              that is running right now, and paying for the thing that comes after it.
             </p>
-            <a class="btn-discord btn-discord--solid" href="https://discord.gg/KQUqj6MnvJ" target="_blank" rel="noopener noreferrer">
-              <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg>
-              Join the Discord
-            </a>
+            <button class="btn-buy" type="button">
+              Get Wolf Den access <span class="price">$25</span>
+            </button>
+            <p class="buy-err">Couldn&rsquo;t start checkout. Try again in a sec.</p>
             <p class="proof">Every call, timestamped, public</p>
+            <p class="cta-note">
+              One time, not a subscription. Or
+              <a href="https://discord.gg/KQUqj6MnvJ" target="_blank" rel="noopener noreferrer">join free</a>
+              and read the record first.
+            </p>
           </aside>
         </div>
       </section>
@@ -940,48 +925,38 @@
     });
   })();
 
-  // ---- notify: POSTs to the Pages Function at /api/subscribe ----
-  var TURNSTILE_SITE_KEY = "0x4AAAAAAD6QJ9gVHsEdOypQ"; // paste your Turnstile site key here to enable bot checks
-  var tsWidget = null;
-  if (TURNSTILE_SITE_KEY) {
-    window.__tsReady = function () {
-      tsWidget = window.turnstile.render("#tsBox", { sitekey: TURNSTILE_SITE_KEY, theme: "dark" });
-    };
-    var ts = document.createElement("script");
-    ts.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?onload=__tsReady";
-    ts.async = true;
-    document.head.appendChild(ts);
-  }
-
-  var notifyForm = document.getElementById("notifyForm");
-  var notifyBtn = notifyForm.querySelector("button");
-  notifyForm.addEventListener("submit", function (e) {
-    e.preventDefault();
-    var err = document.getElementById("notifyErr");
-    err.style.display = "none";
-    notifyBtn.disabled = true;
-    var oldLabel = notifyBtn.textContent;
-    notifyBtn.textContent = "Locking in…";
-    var payload = {
-      email: document.getElementById("notifyEmail").value,
-      company: document.getElementById("hpField").value,
-      token: tsWidget != null && window.turnstile ? window.turnstile.getResponse(tsWidget) : ""
-    };
-    fetch("/api/subscribe", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(payload)
-    }).then(function (r) { return r.json(); }).then(function (j) {
-      if (!j.ok) throw new Error(j.error || "failed");
-      notifyForm.style.display = "none";
-      var tsBox = document.getElementById("tsBox");
-      if (tsBox) tsBox.style.display = "none";
-      document.getElementById("notifyDone").style.display = "block";
-    }).catch(function () {
-      err.style.display = "block";
-      notifyBtn.disabled = false;
-      notifyBtn.textContent = oldLabel;
-      if (tsWidget != null && window.turnstile) window.turnstile.reset(tsWidget);
+  // ---- buy: POSTs to /api/checkout, then hands off to Stripe's hosted page ----
+  // Two buttons carry this (hero and bots section), so bind by class rather
+  // than id. Each one's error line is the .buy-err inside its own parent, which
+  // keeps the two independent.
+  //
+  // On any failure the button is restored and the error is shown. That path is
+  // reachable in normal operation, not just on network trouble: /api/checkout
+  // answers 503 by design until STRIPE_SECRET_KEY is configured, so an
+  // unconfigured deploy degrades to an honest message instead of a dead button.
+  Array.prototype.forEach.call(document.querySelectorAll(".btn-buy"), function (btn) {
+    var err = btn.parentNode.querySelector(".buy-err");
+    btn.addEventListener("click", function () {
+      if (btn.disabled) return;
+      if (err) err.style.display = "none";
+      btn.disabled = true;
+      var oldHTML = btn.innerHTML;
+      btn.textContent = "Opening checkout…";
+      fetch("/api/checkout", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: "{}"
+      }).then(function (r) { return r.json(); }).then(function (j) {
+        if (!j.ok || !j.url) throw new Error(j.error || "failed");
+        // Full-page handoff to Stripe. Deliberately not restoring the button:
+        // the navigation is already committed and a flicker back to the idle
+        // label would read as the click having failed.
+        window.location.href = j.url;
+      }).catch(function () {
+        if (err) err.style.display = "block";
+        btn.disabled = false;
+        btn.innerHTML = oldHTML;
+      });
     });
   });
 

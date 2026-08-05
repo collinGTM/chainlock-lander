@@ -1,0 +1,68 @@
+# chainlock.gg — fill this in ONCE, then:
+#
+#   cp site/.dev.vars.example site/.dev.vars
+#   (fill in the values below)
+#   ./setup/push-env.sh          # pushes all of it to Cloudflare Pages
+#
+# The real .dev.vars is gitignored. This .example file is committed and must
+# never contain a real value.
+#
+# Every line below says exactly which screen its value comes from, so you should
+# not have to go hunting. Work top to bottom; SETUP.md has the same order.
+
+# ─── Stripe ─────────────────────────────────────────────────────────────────
+# Dashboard → Developers → API keys → "Secret key" → Reveal.
+# START IN TEST MODE. The toggle is top-right; a test key starts sk_test_.
+# Switch to the live key only after a test purchase has worked end to end.
+STRIPE_SECRET_KEY=
+
+# Dashboard → Products → your $25 product → the Pricing section → the API ID.
+# It starts with "price_". The one starting "prod_" is the PRODUCT id and is
+# the wrong one; push-env.sh will stop you if you paste that by mistake.
+STRIPE_PRICE_ID=
+
+# Dashboard → Developers → Webhooks → click your chainlock.gg endpoint →
+# "Signing secret" → Reveal. Starts with "whsec_".
+# This is per-endpoint. The value `stripe listen` prints while testing locally
+# is a DIFFERENT secret and will not verify production traffic.
+STRIPE_WEBHOOK_SECRET=
+
+# ─── Resend (the access email) ──────────────────────────────────────────────
+# resend.com → API Keys → Create API Key. Starts with "re_".
+RESEND_API_KEY=
+
+# Who the access email comes from. The domain must be one you have VERIFIED in
+# resend.com → Domains (status must read "Verified", not just listed).
+# Format: either "access@chainlock.gg" or "Chainlock <access@chainlock.gg>".
+MEMBER_FROM_EMAIL=Chainlock <access@chainlock.gg>
+
+# ─── Discord ────────────────────────────────────────────────────────────────
+# discord.com/developers/applications → your app → OAuth2 → Client ID.
+# All Discord ids are long numbers, nothing else.
+DISCORD_CLIENT_ID=
+
+# Same screen → Client Secret → Reset Secret (it is only shown once).
+DISCORD_CLIENT_SECRET=
+
+# Same app → Bot → Reset Token (also only shown once).
+# Paste the token ONLY. Do not include the word "Bot" in front of it.
+DISCORD_BOT_TOKEN=
+
+# Your server's id. Turn on User Settings → Advanced → Developer Mode, then
+# right-click the SERVER icon → Copy Server ID.
+# Careful: right-clicking a channel gives you a channel id, which looks
+# identical and fails in a confusing way.
+DISCORD_GUILD_ID=
+
+# The paid role's id. Server Settings → Roles → right-click your paid role →
+# Copy Role ID.
+# Reminder, because it is the one that silently breaks everything: the BOT's own
+# role must sit ABOVE this role in that list. See SETUP.md step 7.
+DISCORD_PAID_ROLE_ID=
+
+# ─── Site ───────────────────────────────────────────────────────────────────
+# No trailing slash. This builds the checkout return URLs and the OAuth
+# redirect_uri, which must match what you registered on Discord character for
+# character.
+# For local testing with `wrangler pages dev`, use http://127.0.0.1:8788
+SITE_ORIGIN=https://chainlock.gg

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Payment received &middot; Chainlock</title>
+<meta name="description" content="Your Wolf Den access is on its way. Check your email for the link that puts you in the Discord." />
+<meta name="theme-color" content="#0b0e14" />
+<!-- Stripe's success_url. Nothing here is a fulfilment step: access is granted
+     by the webhook, not by the buyer reaching this page, so a closed tab or a
+     failed redirect never costs anyone their access. -->
+<meta name="robots" content="noindex" />
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b0e14'/%3E%3Ccircle cx='32' cy='32' r='11' fill='none' stroke='%23ffb454' stroke-width='6'/%3E%3Ccircle cx='32' cy='32' r='3.5' fill='%232dd4a7'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&amp;family=IBM+Plex+Sans:wght@400;600&amp;family=Unbounded:wght@700;900&amp;display=swap" rel="stylesheet" />
+<style>
+  /* Tokens are duplicated from index.html rather than linked: _headers' CSP has
+     no 'self' in style-src, so this page cannot pull an external stylesheet.
+     Only the subset this page actually uses is copied. */
+  :root {
+    --bg:              oklch(16.3% 0.0136 264.1);
+    --surface:         oklch(20.5% 0.0234 265.5);
+    --border:          oklch(28.9% 0.0355 263.8);
+    --border-bright:   oklch(37.2% 0.0482 263.7);
+
+    --text:            oklch(93.8% 0.011  274.9);
+    --text-dim:        oklch(66.3% 0.0329 267.1);
+    --text-faint:      oklch(50.3% 0.0338 266.1);
+
+    --col-migrated:    oklch(77.8% 0.1461 169.3);
+
+    --space-1: 4px;  --space-2: 8px;   --space-3: 12px; --space-4: 16px;
+    --space-5: 22px; --space-6: 32px;  --space-7: 48px;
+
+    --text-xs:  11px; --text-sm:  12px; --text-base: 14px; --text-md: 16px;
+    --text-lg:  19px; --text-xl:  24px;
+
+    --radius: 10px; --radius-sm: 6px;
+
+    --font-ui: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --dur-micro: 120ms;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: var(--space-5);
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-ui);
+    font-size: var(--text-md);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :where(a, button):focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+
+  .card {
+    width: 100%;
+    max-width: 34rem;
+    border: 1px solid var(--border-bright);
+    border-radius: var(--radius);
+    background: var(--surface);
+    padding: var(--space-6);
+  }
+
+  .stamp {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: var(--space-4);
+  }
+  /* Teal is the "shipped" lifecycle stage (DESIGN.md §6), which is exactly what
+     a completed payment is. Not decorative. */
+  .stamp .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--col-migrated);
+  }
+
+  h1 {
+    margin: 0 0 var(--space-3);
+    font-size: var(--text-xl);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  p { margin: 0 0 var(--space-4); color: var(--text-dim); font-size: var(--text-base); }
+  p.lede { color: var(--text); font-size: var(--text-md); }
+
+  .steps {
+    list-style: none;
+    counter-reset: step;
+    margin: var(--space-5) 0;
+    padding: 0;
+  }
+  .steps li {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--space-4);
+    padding-block: var(--space-3);
+    border-top: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: var(--text-base);
+  }
+  .steps li::before {
+    counter-increment: step;
+    content: counter(step);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.1em;
+    color: var(--text-faint);
+    padding-top: 3px;
+  }
+
+  .foot {
+    margin-top: var(--space-5);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border);
+    font-size: var(--text-base);
+    color: var(--text-faint);
+    margin-bottom: 0;
+  }
+  a { color: var(--text-dim); text-decoration: underline; text-underline-offset: 3px; }
+  a:hover { color: var(--text); }
+
+  .home {
+    display: inline-block;
+    margin-top: var(--space-5);
+    font-family: var(--font-mono);
+    font-size: var(--text-base);
+    color: var(--text-dim);
+    text-decoration: none;
+  }
+  .home:hover { color: var(--text); }
+
+  @media (max-width: 520px) {
+    .card { padding: var(--space-5); }
+  }
+</style>
+</head>
+<body>
+
+  <main class="card">
+    <div class="stamp"><span class="dot" aria-hidden="true"></span>Payment received</div>
+
+    <h1>You&rsquo;re in. Check your email.</h1>
+
+    <p class="lede">
+      We just sent your access link. Open it and it puts you straight into the
+      Wolf Den with your paid role attached.
+    </p>
+
+    <ol class="steps">
+      <li>Open the email from us and click the access link.</li>
+      <li>Discord asks you to authorise. Say yes.</li>
+      <li>You land in the server with the paid channels unlocked.</li>
+    </ol>
+
+    <p class="foot">
+      Nothing in your inbox after a few minutes? Check spam, then email
+      <a href="mailto:access@chainlock.gg">access@chainlock.gg</a> and we will
+      sort it out by hand. Your access is already paid for and recorded, so
+      there is nothing to buy again.
+    </p>
+
+    <a class="home" href="/">&larr; Back to chainlock.gg</a>
+  </main>
+
+</body>
+</html>

@@ -1,2 +1,13 @@
 .DS_Store
 .wrangler/
+
+# Local secrets for `wrangler pages dev` (Stripe/Discord/Resend keys).
+# Must stay ignored: this file holds live credentials.
+.dev.vars
+.dev.vars.*
+# ...but the fill-in-the-blanks template MUST be committed. Without it there is
+# nothing to copy from, and setup/push-env.sh has no starting point.
+!.dev.vars.example
+
+# Local export of the KV launch list (contains real subscriber emails).
+signups-backup*.json
