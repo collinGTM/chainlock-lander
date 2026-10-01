@@ -46,12 +46,33 @@ Tell the two apart by the deploy output. A correct deploy prints **both**:
 ```
 If those two lines are missing, the Worker did not ship. Redeploy, don't shrug.
 
+## Deploy gotcha 3: wrangler uploads EVERY file in `site/`, dotfiles included
+`.gitignore` means nothing to `wrangler pages deploy`. On 2026-10-01 a deploy
+from `site/` published `site/.dev.vars` (Stripe and Discord secrets) at
+`https://chainlock.gg/.dev.vars`, byte for byte, as `application/octet-stream`;
+the edge then kept a cached copy after the file was removed and redeployed, so
+the deployment had to be deleted, the URL purged and every value rotated. The
+secrets file therefore lives at the REPO ROOT now, `~/chainlock-lander/.dev.vars`
+(ignored), and local dev reads it with
+`npx wrangler pages dev . --env-file ../.dev.vars`. Nothing secret goes in
+`site/`, ever. `setup/deploy.sh` refuses to deploy while an unexpected dotfile
+sits there and probes the live origin for leak paths afterwards.
+
 ## The only correct deploy command
-`cd` into `site/` first and deploy `.` — never an absolute path, never the root:
+`setup/deploy.sh`. It `cd`s into `site/`, refuses on stray dotfiles, deploys
+`.` with the exact command below, checks the Functions bundle shipped and
+probes the live origin:
+```
+~/chainlock-lander/setup/deploy.sh
+```
+What it runs, for the record (never by hand from the root, never an absolute path):
 ```
 cd ~/chainlock-lander/site
 npx wrangler pages deploy . --project-name=chainlock --branch=production --commit-dirty=true
 ```
+Non-interactive shells: wrangler refuses to deploy without a TTY unless
+`CLOUDFLARE_API_TOKEN` is set; `script -qec "setup/deploy.sh" /dev/null` gives it
+one and the stored OAuth login works.
 Then verify against the live apex, never the success line:
 ```
 curl -s -o /dev/null -w '%{http_code}\n' https://chainlock.gg/api/subscribe   # want 405
