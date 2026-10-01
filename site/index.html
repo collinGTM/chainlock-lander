@@ -495,6 +495,64 @@
 
   /* ============ workbench — the real capture is the argument ============ */
   .workbench { padding-block: var(--space-8); }
+  /* Closed-test section (2026-10-01): the bots section's two-column grammar
+     (text left, panel right), the same step list, no new colours. The button
+     is the outlined variant of .btn-buy so the page keeps one filled primary
+     per section (the buy), and PAPER rides in the price slot because that is
+     what the tester is getting. */
+  .trial { padding-block: var(--space-8); border-top: 1px solid var(--border); }
+  .trial-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: var(--space-8);
+    align-items: start;
+  }
+  .trial-head h2 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--text-2xl);
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+    margin-bottom: var(--space-3);
+    overflow-wrap: anywhere;
+  }
+  .trial-head p { color: var(--text-dim); font-size: var(--text-md); max-width: 54ch; }
+  .trial-panel {
+    border: 1px solid var(--border-bright);
+    border-radius: var(--radius);
+    background: var(--surface);
+    padding: var(--space-6);
+  }
+  .trial-panel-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: var(--space-4); }
+  .trial-panel p { color: var(--text-dim); font-size: var(--text-base); margin-bottom: var(--space-4); }
+  .trial-panel code { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--text); }
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    height: 52px;
+    padding-inline: var(--space-5);
+    border: 1px solid var(--border-bright);
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text);
+    font-family: var(--font-ui);
+    font-weight: 600;
+    font-size: var(--text-md);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: border-color var(--dur-micro) var(--ease-out), transform var(--dur-micro) var(--ease-out);
+  }
+  .btn-ghost:hover { border-color: var(--text); transform: translateY(-1px); }
+  .btn-ghost .price {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    letter-spacing: 0.06em;
+    color: var(--text-dim);
+    border: 1px solid var(--border-bright);
+    border-radius: var(--radius-sm);
+    padding: 1px 6px;
+  }
   .wb-head { max-width: 62ch; margin-bottom: var(--space-6); }
   .wb-head h2 {
     font-family: var(--font-ui);   /* Workbench: headings are functional, not loud */
@@ -625,6 +683,7 @@
   @media (max-width: 940px) {
     .hero { grid-template-columns: minmax(0, 1fr); gap: var(--space-7); padding-block: var(--space-7) var(--space-6); }
     .bots-grid { grid-template-columns: minmax(0, 1fr); gap: var(--space-7); }
+    .trial-grid { grid-template-columns: minmax(0, 1fr); gap: var(--space-7); }
     .join { position: static; }
     /* Collapse the 12-track grid outright — keeping 12 tracks and spanning 12
        leaves 11 gaps (352px at --space-6), which overflows a 288px content box
@@ -655,6 +714,7 @@
       <a class="wordmark" href="/">CHAINLOCK</a>
       <nav class="flags" aria-label="Sections">
         <a href="#bots">--bots</a>
+        <a href="#test">--test</a>
         <a href="#board">--board</a>
         <a href="https://discord.gg/KQUqj6MnvJ" target="_blank" rel="noopener noreferrer">--discord</a>
       </nav>
@@ -809,6 +869,64 @@
             <span><b>Age</b> live, to the second</span>
           </figcaption>
         </figure>
+      </section>
+
+      <!-- Closed test of the terminal (2026-10-01). Invite-only, paper
+           trading, the terminal served at terminal.chainlock.gg behind a shared
+           password; the hosting runbook lives in chainlock-terminal/docs/deploy.md.
+           Copy stays inside the legal gate: no wallet, no deposit, paper only. -->
+      <section class="trial" id="test">
+        <div class="trial-grid">
+          <div class="trial-head">
+            <h2>Run it yourself. Paper money, real market.</h2>
+            <p>
+              The terminal is in a closed test. Invited testers get the live board, the
+              token pages and a paper account to trade from: real Solana launches, real
+              prices, a practice balance. No wallet, no deposit, nothing of yours is ever
+              touched.
+            </p>
+
+            <ol class="steps">
+              <li>
+                <div>
+                  <h3>Ask for the password</h3>
+                  <p>Testers are invited from Discord. One shared password opens the door, and it changes between rounds.</p>
+                </div>
+              </li>
+              <li>
+                <div>
+                  <h3>Open the terminal</h3>
+                  <p>Pulse fills within seconds. Pick a card, read the chips, set your slippage, buy with the paper balance.</p>
+                </div>
+              </li>
+              <li>
+                <div>
+                  <h3>Tell us what broke</h3>
+                  <p>Rounds are short and sized to a hard monthly data budget. What testers hit decides what ships next.</p>
+                </div>
+              </li>
+            </ol>
+          </div>
+
+          <aside class="trial-panel" aria-label="Closed test status">
+            <div class="trial-panel-head">
+              <span class="label">Closed test</span>
+              <span class="label" style="color: var(--text-faint)">invite only</span>
+            </div>
+            <p>
+              Round one. A handful of seats, Solana launches only. Paper trading: the
+              balance is practice money, the fills follow the live curve, and the
+              <code>PAPER</code> badge never leaves the screen.
+            </p>
+            <a class="btn-ghost" href="https://terminal.chainlock.gg" target="_blank" rel="noopener noreferrer">
+              Open the terminal <span class="price">PAPER</span>
+            </a>
+            <p class="cta-note">
+              Needs the round&rsquo;s password.
+              <a href="https://discord.gg/KQUqj6MnvJ" target="_blank" rel="noopener noreferrer">Ask in Discord</a>.
+            </p>
+          </aside>
+        </div>
       </section>
 
       <section class="board" id="board">
